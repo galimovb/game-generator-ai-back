@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+
+  php:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    container_name: symfony_php
+    volumes:
+      - .:/var/www
+    depends_on:
+      - python
+
+  python:
+    build:
+      context: .
+      dockerfile: docker/python/Dockerfile
+    container_name: python_service
+    volumes:
+      - ./llm:/app
+      - ./llm/models:/app/models
+      - ./llm/lora:/app/lora
+    ports:
+      - "8001:8000"
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:latest
+    container_name: symfony_nginx
+    ports:
+      - "8080:80"
+    volumes:
+      - .:/var/www
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - php
+    restart: unless-stopped
