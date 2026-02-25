@@ -27,12 +27,8 @@ class StageController extends AbstractController
         #[MapRequestPayload] CreateStageRequest $request,
         #[CurrentUser] User $user
     ): JsonResponse {
-        try {
             $stage = $this->stageService->create($request, $user);
             return ApiResponse::success(StageResponse::fromEntity($stage), 201);
-        } catch (\Throwable $e) {
-            return ApiResponse::error($e);
-        }
     }
 
     #[Route('/stages/{id}', methods: ['PUT', 'PATCH'])]
@@ -41,12 +37,8 @@ class StageController extends AbstractController
         #[MapRequestPayload] UpdateStageRequest $request,
         #[CurrentUser] User $user
     ): JsonResponse {
-        try {
             $stage = $this->stageService->update($stage, $request, $user);
             return ApiResponse::success(StageResponse::fromEntity($stage));
-        } catch (\Throwable $e) {
-            return ApiResponse::error($e);
-        }
     }
 
     #[Route('/stages/{id}', methods: ['DELETE'])]
@@ -54,11 +46,7 @@ class StageController extends AbstractController
         ?Stage $stage = null,
         #[CurrentUser] User $user
     ): JsonResponse {
-        try {
             $this->stageService->delete($stage, $user);
             return ApiResponse::success(true, 204);
-        } catch (\Throwable $e) {
-            return ApiResponse::error($e);
-        }
     }
 }

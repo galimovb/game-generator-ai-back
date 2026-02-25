@@ -27,18 +27,13 @@ class GameController extends AbstractController
         #[MapRequestPayload] GenerateGameRequest $request,
         #[CurrentUser] User $user
     ): JsonResponse {
-        try {
-            $game = $this->gameService->generateAndSave($request, $user);
-            return ApiResponse::success(GameResponse::fromEntity($game), 201);
-        } catch (\Throwable $e) {
-            return ApiResponse::error($e);
-        }
+        $game = $this->gameService->generateAndSave($request, $user);
+        return ApiResponse::success(GameResponse::fromEntity($game), 201);
     }
 
     #[Route('', name: 'public', methods: ['GET'])]
     public function listPublic(Request $request): JsonResponse
     {
-        try {
             $page = $request->query->getInt('page', 1);
             $limit = $request->query->getInt('limit', 20);
 
@@ -55,9 +50,6 @@ class GameController extends AbstractController
                     'total' => $result['total']
                 ]
             ]);
-        } catch (\Throwable $e) {
-            return ApiResponse::error($e);
-        }
     }
 
     #[Route('/my', name: 'my', methods: ['GET'])]
@@ -65,7 +57,6 @@ class GameController extends AbstractController
         Request $request,
         #[CurrentUser] User $user
     ): JsonResponse {
-        try {
             $page = $request->query->getInt('page', 1);
             $limit = $request->query->getInt('limit', 20);
 
@@ -82,9 +73,6 @@ class GameController extends AbstractController
                     'total' => $result['total']
                 ]
             ]);
-        } catch (\Throwable $e) {
-            return ApiResponse::error($e);
-        }
     }
 
     #[Route('/{id}', name: 'details', methods: ['GET'])]
@@ -92,12 +80,8 @@ class GameController extends AbstractController
         int $id,
         #[CurrentUser] ?User $user
     ): JsonResponse {
-        try {
             $game = $this->gameService->getGame($id, $user);
             return ApiResponse::success(GameResponse::fromEntity($game));
-        } catch (\Throwable $e) {
-            return ApiResponse::error($e);
-        }
     }
 
     #[Route('/{id}', name: 'update', methods: ['PUT', 'PATCH'])]
@@ -106,12 +90,8 @@ class GameController extends AbstractController
         #[MapRequestPayload] UpdateGameRequest $request,
         #[CurrentUser] User $user
     ): JsonResponse {
-        try {
             $game = $this->gameService->updateGame($id, $request, $user);
             return ApiResponse::success(GameResponse::fromEntity($game));
-        } catch (\Throwable $e) {
-            return ApiResponse::error($e);
-        }
     }
 
     #[Route('/{id}', name: 'delete', methods: ['DELETE'])]
@@ -119,11 +99,7 @@ class GameController extends AbstractController
         int $id,
         #[CurrentUser] User $user
     ): JsonResponse {
-        try {
             $this->gameService->deleteGame($id, $user);
             return ApiResponse::success(true, 204);
-        } catch (\Throwable $e) {
-            return ApiResponse::error($e);
-        }
     }
 }

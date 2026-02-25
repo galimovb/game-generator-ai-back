@@ -24,7 +24,7 @@ class CreateStageRequest
         public readonly int $duration,
 
         #[Assert\Type('array')]
-        public readonly array $tasks = [],
+        public readonly ?array $tasks = [],
 
         #[Assert\Type('array')]
         public readonly array $props = []

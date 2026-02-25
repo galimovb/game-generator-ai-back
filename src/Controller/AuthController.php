@@ -22,11 +22,7 @@ final class AuthController extends AbstractController
     public function register(
         #[MapRequestPayload] RegisterUserRequest $request
     ): JsonResponse {
-        try {
-            $user = $this->registrationService->register($request);
-            return ApiResponse::success(UserResponse::fromEntity($user), 201);
-        } catch (\Throwable $e) {
-            return ApiResponse::error($e);
-        }
+        $user = $this->registrationService->register($request);
+        return ApiResponse::success(UserResponse::fromEntity($user), 201);
     }
 }

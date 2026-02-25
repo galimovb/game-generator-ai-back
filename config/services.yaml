@@ -23,5 +23,11 @@ services:
             - '../src/Entity/'
             - '../src/Kernel.php'
 
+    App\Listener\JwtExceptionSubscriber:
+        tags:
+            - { name: kernel.event_listener, event: lexik_jwt_authentication.on_jwt_invalid, method: onInvalid }
+            - { name: kernel.event_listener, event: lexik_jwt_authentication.on_jwt_expired, method: onExpired }
+            - { name: kernel.event_listener, event: lexik_jwt_authentication.on_jwt_not_found, method: onNotFound }
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

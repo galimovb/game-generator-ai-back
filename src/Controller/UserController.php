@@ -24,11 +24,7 @@ class UserController extends AbstractController
     #[Route('/profile', name: 'profile', methods: ['GET'])]
     public function profile(#[CurrentUser] User $user): JsonResponse
     {
-        try {
             return ApiResponse::success(UserResponse::fromEntity($user));
-        } catch (\Throwable $e) {
-            return ApiResponse::error($e);
-        }
     }
 
     #[Route('/profile', name: 'profile_update', methods: ['PUT', 'PATCH'])]
@@ -36,21 +32,15 @@ class UserController extends AbstractController
         #[CurrentUser] User $user,
         #[MapRequestPayload] UpdateProfileRequest $request
     ): JsonResponse {
-        try {
             $user = $this->userService->updateProfile($user, $request);
             return ApiResponse::success(UserResponse::fromEntity($user));
-        } catch (\Throwable $e) {
-            return ApiResponse::error($e);
-        }
     }
 
     #[Route('', name: 'list', methods: ['GET'])]
     public function list(Request $request): JsonResponse
     {
-        try {
             $page = $request->query->getInt('page', 1);
             $limit = $request->query->getInt('limit', 20);
-            $search = $request->query->get('search');
 
             $result = $this->userService->getUsers($page, $limit);
 
@@ -65,19 +55,12 @@ class UserController extends AbstractController
                     'total' => $result['total']
                 ]
             ]);
-        } catch (\Throwable $e) {
-            return ApiResponse::error($e);
-        }
     }
 
     #[Route('/{id}', name: 'get', methods: ['GET'])]
     public function get(int $id): JsonResponse
     {
-        try {
             $user = $this->userService->getUser($id);
             return ApiResponse::success(UserResponse::fromEntity($user));
-        } catch (\Throwable $e) {
-            return ApiResponse::error($e);
-        }
     }
 }

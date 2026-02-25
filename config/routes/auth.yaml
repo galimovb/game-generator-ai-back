@@ -1,7 +1,3 @@
-api_login:
+api_auth_login:
   path: /api/auth/login
-  methods: [POST]
-
-api_refresh:
-  path: /api/auth/refresh
-  methods: [POST]
+  methods: [POST, OPTIONS]
