@@ -2,14 +2,11 @@
 
 namespace App\DTO\request;
 
-use Symfony\Component\HttpFoundation\File\UploadedFile;
+use App\Enum\GameLocationType;
 use Symfony\Component\Validator\Constraints as Assert;
 
 class GenerateGameRequest
 {
-    /**
-     * @param UploadedFile[] $photos
-     */
     public function __construct(
         #[Assert\NotNull(message: 'Укажите минимальный возраст')]
         #[Assert\Range(min: 3, max: 80)]
@@ -33,8 +30,8 @@ class GenerateGameRequest
         #[Assert\Range(min: 5, max: 480)]
         public readonly int $duration,
 
-        //TODO переделать в ENUM
-        #[Assert\Choice(choices: ['indoor', 'outdoor', 'both'])]
+        #[Assert\NotNull(message: 'Укажите тип локации')]
+        #[Assert\Choice(callback: [GameLocationType::class, 'values'])]
         public readonly string $locationType,
 
         #[Assert\All([
@@ -46,10 +43,9 @@ class GenerateGameRequest
 
         // Фотографии местности для анализа ИИ
         #[Assert\All([
-            new Assert\Image(
-                maxSize: '10M',
-                mimeTypes: ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
-            )
+            new Assert\NotBlank,
+            new Assert\Type('string'),
+            new Assert\Regex('/^data:image\/(jpeg|png|webp|gif);base64,/')
         ])]
         public readonly array $photos = [],
     ) {}

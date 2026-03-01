@@ -5,13 +5,15 @@ namespace App\Service;
 use App\DTO\request\UpdateProfileRequest;
 use App\Entity\User;
 use App\Enum\ErrorCode;
+use App\Enum\UploadType;
 use App\Exception\ApiException;
 use Doctrine\ORM\EntityManagerInterface;
 
 class UserService
 {
     public function __construct(
-        private readonly EntityManagerInterface $entityManager
+        private readonly EntityManagerInterface $entityManager,
+        private readonly UploadService $uploadService
     ) {}
 
     public function updateProfile(User $user, UpdateProfileRequest $request): User
@@ -39,8 +41,22 @@ class UserService
         }
 
         if ($request->avatar !== null) {
-            $user->setAvatar($request->avatar);
+            // Удаляем старый
+            if ($user->getAvatar()) {
+                $this->uploadService->deleteFile($user->getAvatar());
+            }
+
+            // Загружаем новый и получаем путь
+            $avatarPath = $this->uploadService->uploadFromBase64(
+                base64: $request->avatar,
+                type: UploadType::AVATAR,
+                entityId: $user->getId()
+            );
+
+            // Сохраняем путь
+            $user->setAvatar($avatarPath);
         }
+
 
         $this->entityManager->flush();
         $this->entityManager->refresh($user);

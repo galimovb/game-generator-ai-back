@@ -20,7 +20,7 @@ security:
                 check_path: /api/auth/login
                 username_path: email
                 password_path: password
-                success_handler: App\Listener\CustomAuthenticationSuccessHandler
+                success_handler: lexik_jwt_authentication.handler.authentication_success
                 failure_handler: App\Listener\CustomAuthenticationFailureHandler
         refresh:
             pattern: ^/api/auth/refresh
@@ -37,6 +37,7 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
+        - { path: ^/uploads, roles: PUBLIC_ACCESS }
         - { path: ^/api/auth/login, roles: PUBLIC_ACCESS }
         - { path: ^/api/auth/refresh, roles: PUBLIC_ACCESS }
         - { path: ^/api/auth/register, roles: PUBLIC_ACCESS }

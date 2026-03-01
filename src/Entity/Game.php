@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Enum\GameLocationType;
 use App\Repository\GameRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -42,8 +43,8 @@ class Game
     #[ORM\Column(nullable: true)]
     private ?int $duration = null;
 
-    #[ORM\Column(length: 20, nullable: true)]
-    private ?string $locationType = null;
+    #[ORM\Column(length: 20, nullable: true, enumType: GameLocationType::class)]
+    private ?GameLocationType $locationType = null;
 
     #[ORM\Column(type: Types::JSON, nullable: true)]
     private ?array $photos = null;
@@ -195,15 +196,14 @@ class Game
         return $this;
     }
 
-    public function getLocationType(): ?string
+    public function getLocationType(): ?GameLocationType
     {
         return $this->locationType;
     }
 
-    public function setLocationType(?string $locationType): static
+    public function setLocationType(?GameLocationType $locationType): void
     {
         $this->locationType = $locationType;
-        return $this;
     }
 
     public function getPhotos(): ?array

@@ -2,6 +2,7 @@
 
 namespace App\DTO\request;
 
+use App\Enum\GameLocationType;
 use Symfony\Component\Validator\Constraints as Assert;
 
 class UpdateGameRequest
@@ -28,9 +29,9 @@ class UpdateGameRequest
         #[Assert\Positive]
         public readonly ?int $duration = null,
 
-        //TODO переделать в ENUM
-        #[Assert\Choice(choices: ['indoor', 'outdoor', 'both'])]
-        public readonly ?string $locationType = null,
+        #[Assert\NotNull(message: 'Укажите тип локации')]
+        #[Assert\Choice(callback: [GameLocationType::class, 'values'])]
+        public readonly string $locationType,
 
         #[Assert\Type('array')]
         public readonly ?array $requisites = null,

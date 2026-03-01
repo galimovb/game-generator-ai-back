@@ -1,5 +1,5 @@
 <?php
-// src/Service/GameService.php
+
 namespace App\Service;
 
 use App\DTO\request\GenerateGameRequest;
@@ -8,9 +8,10 @@ use App\Entity\Game;
 use App\Entity\Stage;
 use App\Entity\User;
 use App\Enum\ErrorCode;
+use App\Enum\GameLocationType;
+use App\Enum\UploadType;
 use App\Exception\ApiException;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class GameService
@@ -22,15 +23,42 @@ class GameService
         private readonly HttpClientInterface $httpClient,
         private readonly EntityManagerInterface $entityManager,
         private readonly string $aiApiKey,
+        private readonly UploadService $uploadService
     ) {}
-
-    // ==================== ПУБЛИЧНЫЕ МЕТОДЫ ====================
 
     public function generateAndSave(GenerateGameRequest $request, User $author): Game
     {
-        $aiData = $this->callVLM($request);
-        return $this->saveGame($aiData, $author, $request);
+        // Сохраняем фото перед отправкой в AI
+        $savedPhotos = $this->saveRequestPhotos($request, $author->getId());
+
+        // Отправляем в AI с сохраненными фото
+        $aiData = $this->callVLM($request, $request->photos);
+
+        // Сохраняем игру с путями к фото
+        return $this->saveGame($aiData, $author, $request, $savedPhotos);
     }
+
+    /**
+     * Сохраняет фотографии из запроса
+     * @return array<string> Массив путей к сохраненным фото
+     */
+    private function saveRequestPhotos(GenerateGameRequest $request, int $authorId): array
+    {
+        $savedPaths = [];
+
+        foreach ($request->photos as $index => $photo) {
+            $path = $this->uploadService->uploadFromBase64(
+                $photo,
+                UploadType::REQUEST_PHOTO,
+                $authorId,
+            );
+            $savedPaths[] = $path;
+        }
+
+        return $savedPaths;
+    }
+
+    // ==================== ПУБЛИЧНЫЕ МЕТОДЫ ====================
 
     public function getPublicGames(int $page, int $limit): array
     {
@@ -74,7 +102,6 @@ class GameService
     {
         $game = $this->findGameOrFail($id);
 
-        // Проверка доступа к приватной игре
         if (!$game->isPublic()) {
             if (!$user) {
                 throw new ApiException(ErrorCode::UNAUTHORIZED);
@@ -114,7 +141,7 @@ class GameService
             $game->setDuration($request->duration);
         }
         if ($request->locationType !== null) {
-            $game->setLocationType($request->locationType);
+            $game->setLocationType(GameLocationType::from($request->locationType));
         }
         if ($request->requisites !== null) {
             $game->setRequisites($request->requisites);
@@ -140,7 +167,7 @@ class GameService
 
     // ==================== PRIVATE МЕТОДЫ ====================
 
-    private function callVLM(GenerateGameRequest $request): array
+    private function callVLM(GenerateGameRequest $request, array $requestPhotos): array
     {
         $userContent = [
             [
@@ -149,15 +176,14 @@ class GameService
             ]
         ];
 
-        foreach ($request->photos as $photo) {
-            if ($photo instanceof UploadedFile) {
-                $userContent[] = [
-                    'type' => 'image_url',
-                    'image_url' => [
-                        'url' => $this->convertImageToBase64($photo)
-                    ]
-                ];
-            }
+        // Используем сохраненные фото
+        foreach ($requestPhotos as $photo) {
+            $userContent[] = [
+                'type' => 'image_url',
+                'image_url' => [
+                    'url' => $photo
+                ]
+            ];
         }
 
         $response = $this->httpClient->request('POST', self::API_URL . '/chat/completions', [
@@ -193,6 +219,13 @@ class GameService
         }
 
         return $result;
+    }
+
+    private function convertImageFileToBase64(string $filePath): string
+    {
+        $imageData = file_get_contents($filePath);
+        $mimeType = mime_content_type($filePath);
+        return 'data:' . $mimeType . ';base64,' . base64_encode($imageData);
     }
 
     private function buildPrompt(GenerateGameRequest $request): string
@@ -231,14 +264,7 @@ class GameService
 PROMPT;
     }
 
-    private function convertImageToBase64(UploadedFile $file): string
-    {
-        $imageData = file_get_contents($file->getPathname());
-        $mimeType = $file->getMimeType();
-        return 'data:' . $mimeType . ';base64,' . base64_encode($imageData);
-    }
-
-    private function saveGame(array $aiData, User $author, GenerateGameRequest $request): Game
+    private function saveGame(array $aiData, User $author, GenerateGameRequest $request, array $savedPhotos): Game
     {
         $game = new Game();
         $game->setTitle($aiData['title'] ?? 'Без названия');
@@ -249,9 +275,10 @@ PROMPT;
         $game->setMinPlayers($request->minPlayers);
         $game->setMaxPlayers($request->maxPlayers);
         $game->setDuration($request->duration);
-        $game->setLocationType($request->locationType);
+        $game->setLocationType(GameLocationType::from($request->locationType));
         $game->setRequisites($request->requisites);
-        $game->setIsPublic(false); // По умолчанию игра приватная
+        $game->setIsPublic(false);
+        $game->setPhotos($savedPhotos);
 
         $this->entityManager->persist($game);
         $this->entityManager->flush();
@@ -266,7 +293,6 @@ PROMPT;
             $stage->setTasks($stageData['tasks'] ?? []);
             $stage->setProps($stageData['props'] ?? []);
 
-            $game->getStages()->add($stage);
             $this->entityManager->persist($stage);
         }
 

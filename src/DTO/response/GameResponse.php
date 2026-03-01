@@ -3,6 +3,7 @@
 namespace App\DTO\response;
 
 use App\Entity\Game;
+use App\Enum\GameLocationType;
 
 class GameResponse
 {
@@ -16,7 +17,7 @@ class GameResponse
         public readonly ?int $minPlayers,
         public readonly ?int $maxPlayers,
         public readonly ?int $duration,
-        public readonly ?string $locationType,
+        public readonly ?GameLocationType $locationType,
         public readonly ?array $photos,
         public readonly ?array $requisites,
         public readonly ?bool $isPublic,
