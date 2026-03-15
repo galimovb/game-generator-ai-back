@@ -64,6 +64,18 @@ class Game
     #[ORM\Column]
     private bool $isPublic = false;
 
+    /**
+     * @var Collection<int, GameComment>
+     */
+    #[ORM\OneToMany(targetEntity: GameComment::class, mappedBy: 'game', orphanRemoval: true)]
+    private Collection $comments;
+
+    /**
+     * @var Collection<int, GameLike>
+     */
+    #[ORM\OneToMany(targetEntity: GameLike::class, mappedBy: 'game', orphanRemoval: true)]
+    private Collection $likes;
+
     public function isPublic(): bool
     {
         return $this->isPublic;
@@ -101,6 +113,8 @@ class Game
     {
         $this->stages = new ArrayCollection();
         $this->createdAt = new \DateTimeImmutable();
+        $this->comments = new ArrayCollection();
+        $this->likes = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -231,5 +245,65 @@ class Game
     public function setUpdatedAt(): void
     {
         $this->updatedAt = new \DateTimeImmutable();
+    }
+
+    /**
+     * @return Collection<int, GameComment>
+     */
+    public function getComments(): Collection
+    {
+        return $this->comments;
+    }
+
+    public function addComment(GameComment $comment): static
+    {
+        if (!$this->comments->contains($comment)) {
+            $this->comments->add($comment);
+            $comment->setGame($this);
+        }
+
+        return $this;
+    }
+
+    public function removeComment(GameComment $comment): static
+    {
+        if ($this->comments->removeElement($comment)) {
+            // set the owning side to null (unless already changed)
+            if ($comment->getGame() === $this) {
+                $comment->setGame(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, GameLike>
+     */
+    public function getLikes(): Collection
+    {
+        return $this->likes;
+    }
+
+    public function addLike(GameLike $like): static
+    {
+        if (!$this->likes->contains($like)) {
+            $this->likes->add($like);
+            $like->setGame($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLike(GameLike $like): static
+    {
+        if ($this->likes->removeElement($like)) {
+            // set the owning side to null (unless already changed)
+            if ($like->getGame() === $this) {
+                $like->setGame(null);
+            }
+        }
+
+        return $this;
     }
 }

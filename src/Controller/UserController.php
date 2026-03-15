@@ -2,9 +2,9 @@
 
 namespace App\Controller;
 
-use App\DTO\request\UpdateProfileRequest;
-use App\DTO\response\ApiResponse;
-use App\DTO\response\UserResponse;
+use App\DTO\Requests\UpdateProfileRequest;
+use App\DTO\Responses\ApiResponse;
+use App\DTO\Responses\UserResponse;
 use App\Entity\User;
 use App\Service\UserService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;

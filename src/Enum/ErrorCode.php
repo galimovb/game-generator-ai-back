@@ -11,6 +11,10 @@ enum ErrorCode: string
     case UNAUTHORIZED = 'UNAUTHORIZED';
     case FORBIDDEN = 'FORBIDDEN';
     case NOT_FOUND = 'NOT_FOUND';
+    case USER_NOT_FOUND = 'USER_NOT_FOUND';
+    case STAGE_NOT_FOUND = 'STAGE_NOT_FOUND';
+    case GAME_NOT_FOUND = 'GAME_NOT_FOUND';
+    case COMMENT_NOT_FOUND = 'COMMENT_NOT_FOUND';
     case INTERNAL_ERROR = 'INTERNAL_ERROR';
     case INVALID_CREDENTIALS = 'INVALID_CREDENTIALS';
     case TOKEN_EXPIRED = 'TOKEN_EXPIRED';
@@ -27,6 +31,10 @@ enum ErrorCode: string
             self::UNAUTHORIZED => 'Требуется авторизация',
             self::FORBIDDEN => 'Доступ запрещен',
             self::NOT_FOUND => 'Ресурс не найден',
+            self::USER_NOT_FOUND => 'Такого пользователя нет',
+            self::STAGE_NOT_FOUND => 'Такой стадии нет',
+            self::GAME_NOT_FOUND => 'Такой игры нет',
+            self::COMMENT_NOT_FOUND => 'Такого комментария нет',
             self::INTERNAL_ERROR => 'Внутренняя ошибка сервера',
             self::INVALID_CREDENTIALS => 'Неверный email или пароль',
             self::TOKEN_EXPIRED => 'Устаревший токен',
@@ -41,7 +49,7 @@ enum ErrorCode: string
             self::EMAIL_EXIST, self::LOGIN_EXIST, self::VALIDATION_FAILED => 422,
             self::UNAUTHORIZED, self::INVALID_CREDENTIALS, self::TOKEN_EXPIRED, self::TOKEN_INVALID, self::TOKEN_MISSING   => 401,
             self::FORBIDDEN => 403,
-            self::NOT_FOUND => 404,
+            self::NOT_FOUND, self::COMMENT_NOT_FOUND, self::GAME_NOT_FOUND, self::STAGE_NOT_FOUND, self::USER_NOT_FOUND => 404,
             default => 400,
         };
     }

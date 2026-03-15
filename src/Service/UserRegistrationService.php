@@ -2,7 +2,7 @@
 
 namespace App\Service;
 
-use App\DTO\request\RegisterUserRequest;
+use App\DTO\Requests\RegisterUserRequest;
 use App\Entity\User;
 use App\Enum\ErrorCode;
 use App\Exception\ApiException;
@@ -18,22 +18,13 @@ final readonly class UserRegistrationService
         private EntityManagerInterface $entityManager,
         private UserPasswordHasherInterface $passwordHasher,
         private ValidatorInterface $validator,
+        private UserService $userService,
     ) {}
 
     public function register(RegisterUserRequest $request): User
     {
-        $violations = $this->validator->validate($request);
-        if ($violations->count() > 0) {
-            throw new ApiException(ErrorCode::VALIDATION_FAILED);
-        }
-
-        $existing = $this->entityManager
-            ->getRepository(User::class)
-            ->findOneBy(['email' => $request->email]);
-
-        if ($existing) {
-            throw new ApiException(ErrorCode::EMAIL_EXIST);
-        }
+        $this->userService->checkEmailUnique($request->email);
+        $this->userService->checkLoginUnique($request->login);
 
         $user = new User();
         $user->setEmail($request->email);

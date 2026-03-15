@@ -2,10 +2,10 @@
 
 namespace App\Controller;
 
-use App\DTO\request\GenerateGameRequest;
-use App\DTO\request\UpdateGameRequest;
-use App\DTO\response\ApiResponse;
-use App\DTO\response\GameResponse;
+use App\DTO\Requests\GenerateGameRequest;
+use App\DTO\Requests\UpdateGameRequest;
+use App\DTO\Responses\ApiResponse;
+use App\DTO\Responses\GameResponse;
 use App\Entity\User;
 use App\Service\GameService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -50,6 +50,30 @@ class GameController extends AbstractController
                     'total' => $result['total']
                 ]
             ]);
+    }
+
+    #[Route('/favorite', name: 'favorite', methods: ['GET'])]
+    public function listFavorite(
+        Request $request,
+        #[CurrentUser] User $user
+    ): JsonResponse
+    {
+        $page = $request->query->getInt('page', 1);
+        $limit = $request->query->getInt('limit', 20);
+
+        $result = $this->gameService->getUserFavoriteGames($user, $page, $limit);
+
+        return ApiResponse::success([
+            'items' => array_map(
+                fn($game) => GameResponse::fromEntity($game),
+                $result['items']
+            ),
+            'pagination' => [
+                'page' => $page,
+                'limit' => $limit,
+                'total' => $result['total']
+            ]
+        ]);
     }
 
     #[Route('/my', name: 'my', methods: ['GET'])]

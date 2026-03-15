@@ -2,20 +2,21 @@
 
 namespace App\Service;
 
-use App\DTO\request\UpdateProfileRequest;
+use App\DTO\Requests\UpdateProfileRequest;
 use App\Entity\User;
 use App\Enum\ErrorCode;
 use App\Enum\UploadType;
 use App\Exception\ApiException;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
 class UserService
 {
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
-        private readonly UploadService $uploadService
+        private readonly UploadService $uploadService,
+        private readonly UserRepository $userRepository,
     ) {}
-
     public function updateProfile(User $user, UpdateProfileRequest $request): User
     {
         if ($request->name !== null) {
@@ -31,12 +32,12 @@ class UserService
         }
 
         if ($request->email !== null) {
-            $this->checkEmailUnique($request->email, $user->getId());
+            $this->checkEmailUnique($request->email);
             $user->setEmail($request->email);
         }
 
         if ($request->login !== null) {
-            $this->checkLoginUnique($request->login, $user->getId());
+            $this->checkLoginUnique($request->login);
             $user->setLogin($request->login);
         }
 
@@ -66,10 +67,10 @@ class UserService
 
     public function getUser(int $id): User
     {
-        $user = $this->entityManager->getRepository(User::class)->find($id);
+        $user = $this->userRepository->find($id);
 
         if (!$user) {
-            throw new ApiException(ErrorCode::NOT_FOUND);
+            throw new ApiException(ErrorCode::USER_NOT_FOUND);
         }
 
         return $user;
@@ -77,16 +78,14 @@ class UserService
 
     public function getUsers(int $page, int $limit): array
     {
-        $repository = $this->entityManager->getRepository(User::class);
-
-        $items = $repository->findBy(
+        $items = $this->userRepository->findBy(
             ['isBlocked' => false],
             ['id' => 'DESC'],
             $limit,
             ($page - 1) * $limit
         );
 
-        $total = $repository->count(['isBlocked' => false]);
+        $total = $this->userRepository->count(['isBlocked' => false]);
 
         return [
             'items' => $items,
@@ -103,7 +102,7 @@ class UserService
         $user = $this->getUser($id);
 
         if ($user->getId() === $admin->getId()) {
-            throw new ApiException(ErrorCode::CANNOT_BLOCK_SELF);
+            throw new ApiException(ErrorCode::FORBIDDEN);
         }
 
         $user->setIsBlocked(true);
@@ -121,24 +120,24 @@ class UserService
         $this->entityManager->flush();
     }
 
-    private function checkEmailUnique(string $email, int $currentUserId): void
+    public function checkEmailUnique(string $email): void
     {
-        $existing = $this->entityManager->getRepository(User::class)->findOneBy(['email' => $email]);
+        $existing = $this->userRepository->findOneBy(['email' => $email]);
 
-        if ($existing && $existing->getId() !== $currentUserId) {
+        if ($existing) {
             throw new ApiException(ErrorCode::EMAIL_EXIST);
         }
     }
 
-    private function checkLoginUnique(?string $login, int $currentUserId): void
+    public function checkLoginUnique(?string $login): void
     {
         if (!$login) {
             return;
         }
 
-        $existing = $this->entityManager->getRepository(User::class)->findOneBy(['login' => $login]);
+        $existing = $this->userRepository->findOneBy(['login' => $login]);
 
-        if ($existing && $existing->getId() !== $currentUserId) {
+        if ($existing) {
             throw new ApiException(ErrorCode::LOGIN_EXIST);
         }
     }

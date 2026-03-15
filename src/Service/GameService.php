@@ -2,8 +2,9 @@
 
 namespace App\Service;
 
-use App\DTO\request\GenerateGameRequest;
-use App\DTO\request\UpdateGameRequest;
+use App\DTO\Requests\GenerateGameRequest;
+use App\DTO\Requests\UpdateGameRequest;
+use App\Entity\FavoriteGame;
 use App\Entity\Game;
 use App\Entity\Stage;
 use App\Entity\User;
@@ -11,6 +12,7 @@ use App\Enum\ErrorCode;
 use App\Enum\GameLocationType;
 use App\Enum\UploadType;
 use App\Exception\ApiException;
+use App\Repository\GameRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -23,7 +25,8 @@ class GameService
         private readonly HttpClientInterface $httpClient,
         private readonly EntityManagerInterface $entityManager,
         private readonly string $aiApiKey,
-        private readonly UploadService $uploadService
+        private readonly UploadService $uploadService,
+        private readonly GameRepository $gameRepository,
     ) {}
 
     public function generateAndSave(GenerateGameRequest $request, User $author): Game
@@ -62,35 +65,50 @@ class GameService
 
     public function getPublicGames(int $page, int $limit): array
     {
-        $repository = $this->entityManager->getRepository(Game::class);
-
-        $items = $repository->findBy(
+        $items = $this->gameRepository->findBy(
             ['isPublic' => true],
             ['createdAt' => 'DESC'],
             $limit,
             ($page - 1) * $limit
         );
 
-        $total = $repository->count(['isPublic' => true]);
+        $total = $this->gameRepository->count(['isPublic' => true]);
 
         return [
             'items' => $items,
+            'total' => $total
+        ];
+    }
+
+    public function getUserFavoriteGames(User $user, int $page, int $limit): array
+    {
+        $items = $this->gameRepository->findBy(
+            ['owner' => $user],
+            ['createdAt' => 'DESC'],
+            $limit,
+            ($page - 1) * $limit
+        );
+
+        $total = $this->gameRepository->count(['owner' => $user]);
+
+        $games = array_map(fn($favorite) => $favorite->getGame(), $items);
+
+        return [
+            'items' => $games,
             'total' => $total
         ];
     }
 
     public function getUserGames(User $user, int $page, int $limit): array
     {
-        $repository = $this->entityManager->getRepository(Game::class);
-
-        $items = $repository->findBy(
+        $items = $this->gameRepository->findBy(
             ['author' => $user],
             ['createdAt' => 'DESC'],
             $limit,
             ($page - 1) * $limit
         );
 
-        $total = $repository->count(['author' => $user]);
+        $total = $this->gameRepository->count(['author' => $user]);
 
         return [
             'items' => $items,
@@ -98,17 +116,15 @@ class GameService
         ];
     }
 
+    /**
+     * @throws \Exception
+    **/
     public function getGame(int $id, ?User $user = null): Game
     {
         $game = $this->findGameOrFail($id);
 
         if (!$game->isPublic()) {
-            if (!$user) {
-                throw new ApiException(ErrorCode::UNAUTHORIZED);
-            }
-            if (!$this->isAuthorOrAdmin($game, $user)) {
-                throw new ApiException(ErrorCode::FORBIDDEN);
-            }
+            $this->checkAccess($game, $user);
         }
 
         return $game;
@@ -304,23 +320,17 @@ PROMPT;
 
     private function findGameOrFail(int $id): Game
     {
-        $game = $this->entityManager->getRepository(Game::class)->find($id);
+        $game = $this->gameRepository->find($id);
         if (!$game) {
-            throw new ApiException(ErrorCode::NOT_FOUND);
+            throw new ApiException(ErrorCode::GAME_NOT_FOUND);
         }
         return $game;
     }
 
     private function checkAccess(Game $game, User $user): void
     {
-        if (!$this->isAuthorOrAdmin($game, $user)) {
+        if (!$user->isAdmin() && !$user->isGameAuthor($game)) {
             throw new ApiException(ErrorCode::FORBIDDEN);
         }
-    }
-
-    private function isAuthorOrAdmin(Game $game, User $user): bool
-    {
-        return $game->getAuthor()->getId() === $user->getId()
-            || in_array('ROLE_ADMIN', $user->getRoles());
     }
 }

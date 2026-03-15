@@ -1,6 +1,6 @@
 <?php
 
-namespace App\DTO\response;
+namespace App\DTO\Responses;
 
 use App\Entity\Game;
 use App\Enum\GameLocationType;
@@ -11,7 +11,7 @@ class GameResponse
         public readonly int $id,
         public readonly ?string $title,
         public readonly ?string $description,
-        public readonly int $authorId,
+        public readonly ?UserResponse $author,
         public readonly ?int $minAge,
         public readonly ?int $maxAge,
         public readonly ?int $minPlayers,
@@ -21,8 +21,9 @@ class GameResponse
         public readonly ?array $photos,
         public readonly ?array $requisites,
         public readonly ?bool $isPublic,
-        /** @var StageResponse[] */
-        public readonly array $stages,
+        public readonly ?array $stages,
+        public readonly ?int $commentsCount,
+        public readonly ?int $likesCount,
         public readonly string $createdAt,
         public readonly ?string $updatedAt,
     ) {}
@@ -33,7 +34,7 @@ class GameResponse
             id: $game->getId(),
             title: $game->getTitle(),
             description: $game->getDescription(),
-            authorId: $game->getAuthor()->getId(),
+            author: UserResponse::fromEntity($game->getAuthor()),
             minAge: $game->getMinAge(),
             maxAge: $game->getMaxAge(),
             minPlayers: $game->getMinPlayers(),
@@ -42,13 +43,15 @@ class GameResponse
             locationType: $game->getLocationType(),
             photos: $game->getPhotos(),
             requisites: $game->getRequisites(),
+            isPublic: $game->isPublic(),
             stages: array_map(
                 fn($stage) => StageResponse::fromEntity($stage),
                 $game->getStages()->toArray()
             ),
+            commentsCount: count($game->getComments()),
+            likesCount: count($game->getLikes()),
             createdAt: $game->getCreatedAt()->format('c'),
             updatedAt: $game->getUpdatedAt()?->format('c'),
-            isPublic: $game->isPublic(),
         );
     }
 }

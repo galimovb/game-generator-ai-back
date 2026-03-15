@@ -2,8 +2,8 @@
 
 namespace App\Service;
 
-use App\DTO\request\CreateStageRequest;
-use App\DTO\request\UpdateStageRequest;
+use App\DTO\Requests\CreateStageRequest;
+use App\DTO\Requests\UpdateStageRequest;
 use App\Entity\Game;
 use App\Entity\Stage;
 use App\Entity\User;
@@ -14,12 +14,13 @@ use Doctrine\ORM\EntityManagerInterface;
 class StageService
 {
     public function __construct(
-        private readonly EntityManagerInterface $entityManager
+        private readonly EntityManagerInterface $entityManager,
+        private readonly GameService $gameService,
     ) {}
 
     public function create(CreateStageRequest $request, User $user): Stage
     {
-        $game = $this->findGame($request->gameId);
+        $game = $this->gameService->getGame($request->gameId, $user);
         $this->checkAccess($game, $user);
 
         $stage = new Stage();
@@ -40,7 +41,7 @@ class StageService
     public function update(?Stage $stage, UpdateStageRequest $request, User $user): Stage
     {
         if (!$stage) {
-            throw new ApiException(ErrorCode::NOT_FOUND);
+            throw new ApiException(ErrorCode::STAGE_NOT_FOUND);
         }
         $this->checkAccess($stage->getGame(), $user);
 
@@ -68,22 +69,13 @@ class StageService
     public function delete(?Stage $stage, User $user): void
     {
         if (!$stage) {
-            throw new ApiException(ErrorCode::NOT_FOUND);
+            throw new ApiException(ErrorCode::STAGE_NOT_FOUND);
         }
 
         $this->checkAccess($stage->getGame(), $user);
 
         $this->entityManager->remove($stage);
         $this->entityManager->flush();
-    }
-
-    private function findGame(int $id): Game
-    {
-        $game = $this->entityManager->getRepository(Game::class)->find($id);
-        if (!$game) {
-            throw new ApiException(ErrorCode::NOT_FOUND);
-        }
-        return $game;
     }
 
     private function checkAccess(Game $game, User $user): void

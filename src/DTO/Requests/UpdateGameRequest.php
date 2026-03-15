@@ -1,6 +1,6 @@
 <?php
 
-namespace App\DTO\request;
+namespace App\DTO\Requests;
 
 use App\Enum\GameLocationType;
 use Symfony\Component\Validator\Constraints as Assert;

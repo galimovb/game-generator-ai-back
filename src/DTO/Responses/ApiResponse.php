@@ -1,6 +1,6 @@
 <?php
 
-namespace App\DTO\response;
+namespace App\DTO\Responses;
 
 use App\Enum\ErrorCode;
 use App\Exception\ApiException;

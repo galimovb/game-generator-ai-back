@@ -2,10 +2,10 @@
 
 namespace App\Controller;
 
-use App\DTO\request\CreateStageRequest;
-use App\DTO\request\UpdateStageRequest;
-use App\DTO\response\ApiResponse;
-use App\DTO\response\StageResponse;
+use App\DTO\Requests\CreateStageRequest;
+use App\DTO\Requests\UpdateStageRequest;
+use App\DTO\Responses\ApiResponse;
+use App\DTO\Responses\StageResponse;
 use App\Entity\Stage;
 use App\Entity\User;
 use App\Service\StageService;

@@ -2,7 +2,7 @@
 
 namespace App\Listener;
 
-use App\DTO\Response\ApiResponse;
+use App\DTO\Responses\ApiResponse;
 use App\Enum\ErrorCode;
 use App\Exception\ApiException;
 use Lexik\Bundle\JWTAuthenticationBundle\Event\JWTExpiredEvent;
