@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\GameLike;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -40,4 +41,22 @@ class GameLikeRepository extends ServiceEntityRepository
 //            ->getOneOrNullResult()
 //        ;
 //    }
+
+    public function findLikedGameIds(User $user, array $gameIds): array
+    {
+        if (empty($gameIds)) {
+            return [];
+        }
+
+        $result = $this->createQueryBuilder('gl')
+            ->select('IDENTITY(gl.game) as gameId')
+            ->where('gl.author = :user')
+            ->andWhere('gl.game IN (:gameIds)')
+            ->setParameter('user', $user)
+            ->setParameter('gameIds', $gameIds)
+            ->getQuery()
+            ->getScalarResult();
+
+        return array_column($result, 'gameId');
+    }
 }

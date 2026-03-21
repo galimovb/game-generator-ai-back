@@ -32,7 +32,7 @@ class GameController extends AbstractController
     }
 
     #[Route('', name: 'public', methods: ['GET'])]
-    public function listPublic(Request $request): JsonResponse
+    public function listPublic(Request $request, #[CurrentUser] User $user): JsonResponse
     {
             $page = $request->query->getInt('page', 1);
             $limit = $request->query->getInt('limit', 20);
@@ -41,7 +41,7 @@ class GameController extends AbstractController
 
             return ApiResponse::success([
                 'items' => array_map(
-                    fn($game) => GameResponse::fromEntity($game),
+                    fn($item) => GameResponse::fromEntity($item['game'], $item['isLiked']),
                     $result['items']
                 ),
                 'pagination' => [
@@ -52,8 +52,8 @@ class GameController extends AbstractController
             ]);
     }
 
-    #[Route('/favorite', name: 'favorite', methods: ['GET'])]
-    public function listFavorite(
+    #[Route('/liked', name: 'liked', methods: ['GET'])]
+    public function listLike(
         Request $request,
         #[CurrentUser] User $user
     ): JsonResponse
@@ -61,11 +61,11 @@ class GameController extends AbstractController
         $page = $request->query->getInt('page', 1);
         $limit = $request->query->getInt('limit', 20);
 
-        $result = $this->gameService->getUserFavoriteGames($user, $page, $limit);
+        $result = $this->gameService->getUserLikeGames($user, $page, $limit);
 
         return ApiResponse::success([
             'items' => array_map(
-                fn($game) => GameResponse::fromEntity($game),
+                fn($item) => GameResponse::fromEntity($item['game'], $item['isLiked']),
                 $result['items']
             ),
             'pagination' => [
@@ -88,7 +88,7 @@ class GameController extends AbstractController
 
             return ApiResponse::success([
                 'items' => array_map(
-                    fn($game) => GameResponse::fromEntity($game),
+                    fn($item) => GameResponse::fromEntity($item['game'], $item['isLiked']),
                     $result['items']
                 ),
                 'pagination' => [

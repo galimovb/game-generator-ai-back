@@ -4,7 +4,6 @@ namespace App\Service;
 
 use App\DTO\Requests\GenerateGameRequest;
 use App\DTO\Requests\UpdateGameRequest;
-use App\Entity\FavoriteGame;
 use App\Entity\Game;
 use App\Entity\Stage;
 use App\Entity\User;
@@ -12,6 +11,7 @@ use App\Enum\ErrorCode;
 use App\Enum\GameLocationType;
 use App\Enum\UploadType;
 use App\Exception\ApiException;
+use App\Repository\GameLikeRepository;
 use App\Repository\GameRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -27,7 +27,30 @@ class GameService
         private readonly string $aiApiKey,
         private readonly UploadService $uploadService,
         private readonly GameRepository $gameRepository,
+        private readonly GameLikeRepository $gameLikeRepository,
     ) {}
+
+    private function attachLikeInfo(array $games, ?User $user): array
+    {
+        if (!$user || empty($games)) {
+            return array_map(fn($game) => [
+                'game' => $game,
+                'isLiked' => false,
+            ], $games);
+        }
+
+        $gameIds = array_map(fn($game) => $game->getId(), $games);
+
+        $likedIds = $this->gameLikeRepository->findLikedGameIds($user, $gameIds);
+        $likedMap = array_flip($likedIds);
+
+        return array_map(function ($game) use ($likedMap) {
+            return [
+                'game' => $game,
+                'isLiked' => isset($likedMap[$game->getId()]),
+            ];
+        }, $games);
+    }
 
     public function generateAndSave(GenerateGameRequest $request, User $author): Game
     {
@@ -63,7 +86,7 @@ class GameService
 
     // ==================== ПУБЛИЧНЫЕ МЕТОДЫ ====================
 
-    public function getPublicGames(int $page, int $limit): array
+    public function getPublicGames(int $page, int $limit, ?User $user = null): array
     {
         $items = $this->gameRepository->findBy(
             ['isPublic' => true],
@@ -75,26 +98,29 @@ class GameService
         $total = $this->gameRepository->count(['isPublic' => true]);
 
         return [
-            'items' => $items,
+            'items' => $this->attachLikeInfo($items, $user),
             'total' => $total
         ];
     }
 
-    public function getUserFavoriteGames(User $user, int $page, int $limit): array
+    public function getUserLikeGames(User $user, int $page, int $limit): array
     {
-        $items = $this->gameRepository->findBy(
-            ['owner' => $user],
+        $likes = $this->gameLikeRepository->findBy(
+            ['author' => $user],
             ['createdAt' => 'DESC'],
             $limit,
             ($page - 1) * $limit
         );
 
-        $total = $this->gameRepository->count(['owner' => $user]);
+        $total = $this->gameLikeRepository->count(['author' => $user]);
 
-        $games = array_map(fn($favorite) => $favorite->getGame(), $items);
+        $games = array_map(fn($like) => $like->getGame(), $likes);
 
         return [
-            'items' => $games,
+            'items' => array_map(fn($game) => [
+                'game' => $game,
+                'isLiked' => true,
+            ], $games),
             'total' => $total
         ];
     }
@@ -111,7 +137,7 @@ class GameService
         $total = $this->gameRepository->count(['author' => $user]);
 
         return [
-            'items' => $items,
+            'items' => $this->attachLikeInfo($items, $user),
             'total' => $total
         ];
     }

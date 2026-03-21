@@ -57,16 +57,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: GameLike::class, mappedBy: 'author', orphanRemoval: true)]
     private Collection $likes;
 
-    /**
-     * @var Collection<int, FavoriteGame>
-     */
-    #[ORM\OneToMany(targetEntity: FavoriteGame::class, mappedBy: 'owner', orphanRemoval: true)]
-    private Collection $favoriteGames;
-
     public function __construct()
     {
         $this->likes = new ArrayCollection();
-        $this->favoriteGames = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -251,36 +244,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($like->getAuthor() === $this) {
                 $like->setAuthor(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, FavoriteGame>
-     */
-    public function getFavoriteGames(): Collection
-    {
-        return $this->favoriteGames;
-    }
-
-    public function addFavoriteGame(FavoriteGame $favoriteGame): static
-    {
-        if (!$this->favoriteGames->contains($favoriteGame)) {
-            $this->favoriteGames->add($favoriteGame);
-            $favoriteGame->setOwner($this);
-        }
-
-        return $this;
-    }
-
-    public function removeFavoriteGame(FavoriteGame $favoriteGame): static
-    {
-        if ($this->favoriteGames->removeElement($favoriteGame)) {
-            // set the owning side to null (unless already changed)
-            if ($favoriteGame->getOwner() === $this) {
-                $favoriteGame->setOwner(null);
             }
         }
 

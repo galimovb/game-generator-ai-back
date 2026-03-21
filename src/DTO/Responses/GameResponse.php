@@ -3,6 +3,7 @@
 namespace App\DTO\Responses;
 
 use App\Entity\Game;
+use App\Entity\User;
 use App\Enum\GameLocationType;
 
 class GameResponse
@@ -24,12 +25,15 @@ class GameResponse
         public readonly ?array $stages,
         public readonly ?int $commentsCount,
         public readonly ?int $likesCount,
+        public readonly ?bool $isLiked,
         public readonly string $createdAt,
         public readonly ?string $updatedAt,
     ) {}
 
-    public static function fromEntity(Game $game): self
-    {
+    public static function fromEntity(
+        Game $game,
+        bool $isLiked = false
+    ): self {
         return new self(
             id: $game->getId(),
             title: $game->getTitle(),
@@ -48,8 +52,9 @@ class GameResponse
                 fn($stage) => StageResponse::fromEntity($stage),
                 $game->getStages()->toArray()
             ),
-            commentsCount: count($game->getComments()),
-            likesCount: count($game->getLikes()),
+            commentsCount: count($game->getComments()), //TODO фикс на производительное решение
+            likesCount: count($game->getLikes()),       //TODO фикс на производительное решение
+            isLiked: $isLiked,
             createdAt: $game->getCreatedAt()->format('c'),
             updatedAt: $game->getUpdatedAt()?->format('c'),
         );

@@ -86,8 +86,6 @@ class Game
         $this->isPublic = $isPublic;
     }
 
-
-
     public function getRequisites(): ?array
     {
         return $this->requisites;
