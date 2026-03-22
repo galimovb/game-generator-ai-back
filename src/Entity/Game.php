@@ -10,6 +10,12 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: GameRepository::class)]
+#[ORM\Table(name: 'game', indexes: [
+    new ORM\Index(name: 'idx_game_author', columns: ['author_id']),
+    new ORM\Index(name: 'idx_game_public', columns: ['is_public']),
+    new ORM\Index(name: 'idx_game_created', columns: ['created_at']),
+    new ORM\Index(name: 'idx_game_public_created', columns: ['is_public', 'created_at'])
+])]
 #[ORM\HasLifecycleCallbacks]
 class Game
 {
