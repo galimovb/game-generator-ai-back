@@ -57,9 +57,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: GameLike::class, mappedBy: 'author', orphanRemoval: true)]
     private Collection $likes;
 
+    #[ORM\OneToOne(mappedBy: 'owner', cascade: ['persist', 'remove'])]
+    private ?UserSettings $userSettings;
+
     public function __construct()
     {
         $this->likes = new ArrayCollection();
+
+        //Создаем дефолт настройки
+        $this->userSettings = new UserSettings();
+        $this->userSettings->setOwner($this);
     }
 
     public function getId(): ?int
@@ -246,6 +253,23 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $like->setAuthor(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getUserSettings(): ?UserSettings
+    {
+        return $this->userSettings;
+    }
+
+    public function setUserSettings(UserSettings $userSettings): static
+    {
+        // set the owning side of the relation if necessary
+        if ($userSettings->getOwner() !== $this) {
+            $userSettings->setOwner($this);
+        }
+
+        $this->userSettings = $userSettings;
 
         return $this;
     }

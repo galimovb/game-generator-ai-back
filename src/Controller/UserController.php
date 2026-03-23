@@ -3,13 +3,14 @@
 namespace App\Controller;
 
 use App\DTO\Requests\UpdateProfileRequest;
+use App\DTO\Requests\UpdateUserSettingsRequest;
 use App\DTO\Responses\ApiResponse;
 use App\DTO\Responses\UserResponse;
+use App\DTO\Responses\UserSettingsResponse;
 use App\Entity\User;
 use App\Service\UserService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
@@ -36,31 +37,29 @@ class UserController extends AbstractController
             return ApiResponse::success(UserResponse::fromEntity($user));
     }
 
-    #[Route('', name: 'list', methods: ['GET'])]
-    public function list(Request $request): JsonResponse
-    {
-            $page = $request->query->getInt('page', 1);
-            $limit = $request->query->getInt('limit', 20);
-
-            $result = $this->userService->getUsers($page, $limit);
-
-            return ApiResponse::success([
-                'items' => array_map(
-                    fn($user) => UserResponse::fromEntity($user),
-                    $result['items']
-                ),
-                'pagination' => [
-                    'page' => $page,
-                    'limit' => $limit,
-                    'total' => $result['total']
-                ]
-            ]);
-    }
-
     #[Route('/{id}', name: 'get', methods: ['GET'])]
     public function get(int $id): JsonResponse
     {
             $user = $this->userService->getUser($id);
             return ApiResponse::success(UserResponse::fromEntity($user));
+    }
+
+    #[Route('/profile/settings', name: 'profile_settings_get', methods: ['GET'])]
+    public function getSettings(#[CurrentUser] User $user): JsonResponse
+    {
+        $settings = $this->userService->getSettings($user);
+
+        return ApiResponse::success(UserSettingsResponse::fromEntity($settings));
+    }
+
+    #[Route('/profile/settings', name: 'profile_settings_update', methods: ['PUT', 'PATCH'])]
+    public function updateSettings(
+        #[CurrentUser] User $user,
+        #[MapRequestPayload] UpdateUserSettingsRequest $request
+    ): JsonResponse
+    {
+        $settings = $this->userService->updateSettings($user, $request);
+
+        return ApiResponse::success(UserSettingsResponse::fromEntity($settings));
     }
 }

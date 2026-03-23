@@ -3,8 +3,11 @@
 namespace App\Service;
 
 use App\DTO\Requests\UpdateProfileRequest;
+use App\DTO\Requests\UpdateUserSettingsRequest;
 use App\Entity\User;
+use App\Entity\UserSettings;
 use App\Enum\ErrorCode;
+use App\Enum\ModelType;
 use App\Enum\UploadType;
 use App\Exception\ApiException;
 use App\Repository\UserRepository;
@@ -140,5 +143,22 @@ class UserService
         if ($existing) {
             throw new ApiException(ErrorCode::LOGIN_EXIST);
         }
+    }
+
+    public function getSettings(User $user): UserSettings
+    {
+        return $user->getUserSettings();
+    }
+
+    public function updateSettings(User $user, UpdateUserSettingsRequest $request): UserSettings
+    {
+        $settings = $this->getSettings($user);
+
+        $settings->setGenerationModel(ModelType::from($request->generationModel));
+        $settings->setGenerationCreative($request->generationCreative);
+
+        $this->entityManager->flush();
+
+        return $settings;
     }
 }
