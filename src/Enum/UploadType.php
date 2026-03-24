@@ -7,11 +7,14 @@ enum UploadType: string
     case AVATAR = 'avatar';
     case REQUEST_PHOTO = 'request_photo';
 
+    case TICKET_PHOTO = 'ticket_photo';
+
     public function getPath(): string
     {
         return match($this) {
             self::AVATAR => 'avatars',
             self::REQUEST_PHOTO => 'requests',
+            self::TICKET_PHOTO => 'tickets',
         };
     }
 

@@ -7,6 +7,7 @@ use App\DTO\Requests\UpdateGameRequest;
 use App\DTO\Responses\ApiResponse;
 use App\DTO\Responses\GameResponse;
 use App\Entity\User;
+use App\Service\GameGenerationService;
 use App\Service\GameService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -19,7 +20,8 @@ use Symfony\Component\Security\Http\Attribute\CurrentUser;
 class GameController extends AbstractController
 {
     public function __construct(
-        private readonly GameService $gameService
+        private readonly GameService $gameService,
+        private readonly GameGenerationService $gameGenerationService,
     ) {}
 
     #[Route('/generate', name: 'generate', methods: ['POST'])]
@@ -27,7 +29,7 @@ class GameController extends AbstractController
         #[MapRequestPayload] GenerateGameRequest $request,
         #[CurrentUser] User $user
     ): JsonResponse {
-        $game = $this->gameService->generateAndSave($request, $user);
+        $game = $this->gameGenerationService->generateAndSave($request, $user);
         return ApiResponse::success(GameResponse::fromEntity($game), 201);
     }
 

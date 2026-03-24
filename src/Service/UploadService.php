@@ -47,46 +47,12 @@ class UploadService
     }
 
     /**
-     * Загружает фото из UploadedFile
-     */
-    public function uploadFromFile(
-        UploadedFile $file,
-        UploadType $type,
-        ?int $entityId = null
-    ): string {
-        if (!$file->isValid()) {
-            throw new \InvalidArgumentException('Файл поврежден');
-        }
-
-        $extension = $file->guessExtension() ?? 'bin';
-        $filename = $this->generateHashedFilename($extension, $type, $entityId);
-
-        $uploadPath = $this->uploadDirectory . '/' . $type->getPath();
-
-        if (!is_dir($uploadPath)) {
-            mkdir($uploadPath, 0755, true);
-        }
-
-        $file->move($uploadPath, $filename);
-
-        return $type->getPath() . '/' . $filename;
-    }
-
-    /**
      * Удаляет файл
      */
     public function deleteFile(string $filePath): bool
     {
         $fullPath = $this->uploadDirectory . '/' . ltrim($filePath, '/');
         return file_exists($fullPath) ? unlink($fullPath) : false;
-    }
-
-    /**
-     * Получить URL файла
-     */
-    public function getFileUrl(string $filePath): string
-    {
-        return '/uploads/' . ltrim($filePath, '/');
     }
 
     /**

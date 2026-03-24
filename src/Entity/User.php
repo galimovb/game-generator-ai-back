@@ -60,6 +60,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToOne(mappedBy: 'owner', cascade: ['persist', 'remove'])]
     private ?UserSettings $userSettings;
 
+    /**
+     * @var Collection<int, Ticket>
+     */
+    #[ORM\OneToMany(targetEntity: Ticket::class, mappedBy: 'author')]
+    private Collection $tickets;
+
+    /**
+     * @var Collection<int, Ticket>
+     */
+    #[ORM\OneToMany(targetEntity: Ticket::class, mappedBy: 'assignedTo')]
+    private Collection $assignedTickets;
+
     public function __construct()
     {
         $this->likes = new ArrayCollection();
@@ -67,6 +79,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         //Создаем дефолт настройки
         $this->userSettings = new UserSettings();
         $this->userSettings->setOwner($this);
+        $this->tickets = new ArrayCollection();
+        $this->assignedTickets = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -270,6 +284,66 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         }
 
         $this->userSettings = $userSettings;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Ticket>
+     */
+    public function getTickets(): Collection
+    {
+        return $this->tickets;
+    }
+
+    public function addTicket(Ticket $ticket): static
+    {
+        if (!$this->tickets->contains($ticket)) {
+            $this->tickets->add($ticket);
+            $ticket->setAuthor($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTicket(Ticket $ticket): static
+    {
+        if ($this->tickets->removeElement($ticket)) {
+            // set the owning side to null (unless already changed)
+            if ($ticket->getAuthor() === $this) {
+                $ticket->setAuthor(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Ticket>
+     */
+    public function getAssignedTickets(): Collection
+    {
+        return $this->assignedTickets;
+    }
+
+    public function addAssignedTicket(Ticket $assignedTicket): static
+    {
+        if (!$this->assignedTickets->contains($assignedTicket)) {
+            $this->assignedTickets->add($assignedTicket);
+            $assignedTicket->setAssignedTo($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAssignedTicket(Ticket $assignedTicket): static
+    {
+        if ($this->assignedTickets->removeElement($assignedTicket)) {
+            // set the owning side to null (unless already changed)
+            if ($assignedTicket->getAssignedTo() === $this) {
+                $assignedTicket->setAssignedTo(null);
+            }
+        }
 
         return $this;
     }
