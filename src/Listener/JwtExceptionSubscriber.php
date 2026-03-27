@@ -2,9 +2,9 @@
 
 namespace App\Listener;
 
-use App\DTO\Responses\ApiResponse;
-use App\Enum\ErrorCode;
-use App\Exception\ApiException;
+use App\Shared\DTO\Response\ApiResponse;
+use App\Shared\Enum\ErrorCode;
+use App\Shared\Exception\ApiException;
 use Lexik\Bundle\JWTAuthenticationBundle\Event\JWTExpiredEvent;
 use Lexik\Bundle\JWTAuthenticationBundle\Event\JWTInvalidEvent;
 use Lexik\Bundle\JWTAuthenticationBundle\Event\JWTNotFoundEvent;

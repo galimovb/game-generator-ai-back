@@ -2,8 +2,8 @@
 
 namespace App\Listener;
 
-use App\Enum\ErrorCode;
-use App\Exception\ApiException;
+use App\Shared\Enum\ErrorCode;
+use App\Shared\Exception\ApiException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;

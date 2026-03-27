@@ -2,10 +2,10 @@
 
 namespace App\Listener;
 
+use App\Shared\DTO\Response\ApiResponse;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use App\DTO\Responses\ApiResponse;
 
 class ApiExceptionSubscriber implements EventSubscriberInterface
 {
