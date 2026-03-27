@@ -30,7 +30,7 @@ services:
             - { name: kernel.event_listener, event: lexik_jwt_authentication.on_jwt_expired, method: onExpired }
             - { name: kernel.event_listener, event: lexik_jwt_authentication.on_jwt_not_found, method: onNotFound }
 
-    App\Service\UploadService:
+    App\Shared\Service\UploadService:
         arguments:
             $uploadDirectory: '%upload_directory%'
     # add more service definitions when explicit configuration is needed

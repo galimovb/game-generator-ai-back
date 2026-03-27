@@ -24,7 +24,7 @@ class GameCommentService
      */
     public function getGameComments(int $gameId, int $page, int $limit, User $user): array
     {
-        $game = $this->gameService->getGame($gameId, $user);
+        $game = $this->gameService->getGame($gameId);
 
         $items = $this->commentRepository->findBy(
             ['game' => $game],
@@ -46,7 +46,7 @@ class GameCommentService
      */
     public function createComment(int $gameId, CreateCommentRequest $request, User $user): GameComment
     {
-        $game = $this->gameService->getGame($gameId, $user);
+        $game = $this->gameService->getGame($gameId);
 
         $comment = new GameComment();
         $comment->setGame($game);
@@ -78,7 +78,6 @@ class GameCommentService
         $this->checkCommentOwnership($comment, $user);
 
         $comment->setText($request->text);
-        $comment->setUpdatedAt(new \DateTimeImmutable());
 
         $this->em->flush();
 

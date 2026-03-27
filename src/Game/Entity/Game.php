@@ -4,8 +4,8 @@ namespace App\Game\Entity;
 
 use App\Game\Repository\GameRepository;
 use App\Shared\Enum\GameLocationType;
-use App\Stage\Entity\Stage;
-use App\User\Entity\User;
+use App\Shared\Trait\AuthorableTrait;
+use App\Shared\Trait\TimestampableTrait;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -15,6 +15,8 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\HasLifecycleCallbacks]
 class Game
 {
+    use TimestampableTrait;
+    use AuthorableTrait;
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -25,10 +27,6 @@ class Game
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
-
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?User $author = null;
 
     #[ORM\Column(nullable: true)]
     private ?int $minAge = null;
@@ -51,13 +49,7 @@ class Game
     #[ORM\Column(type: Types::JSON, nullable: true)]
     private ?array $photos = null;
 
-    #[ORM\Column]
-    private ?\DateTimeImmutable $createdAt;
-
-    #[ORM\Column(nullable: true)]
-    private ?\DateTimeImmutable $updatedAt = null;
-
-    #[ORM\OneToMany(mappedBy: 'game', targetEntity: Stage::class, cascade: ['persist', 'remove'])]
+    #[ORM\OneToMany(mappedBy: 'game', targetEntity: GameStage::class, cascade: ['persist', 'remove'])]
     private Collection $stages;
 
     #[ORM\Column(nullable: true)]
@@ -112,7 +104,6 @@ class Game
     public function __construct()
     {
         $this->stages = new ArrayCollection();
-        $this->createdAt = new \DateTimeImmutable();
         $this->comments = new ArrayCollection();
         $this->likes = new ArrayCollection();
     }
@@ -141,17 +132,6 @@ class Game
     public function setDescription(?string $description): static
     {
         $this->description = $description;
-        return $this;
-    }
-
-    public function getAuthor(): ?User
-    {
-        return $this->author;
-    }
-
-    public function setAuthor(?User $author): static
-    {
-        $this->author = $author;
         return $this;
     }
 
@@ -229,22 +209,6 @@ class Game
     {
         $this->photos = $photos;
         return $this;
-    }
-
-    public function getCreatedAt(): ?\DateTimeImmutable
-    {
-        return $this->createdAt;
-    }
-
-    public function getUpdatedAt(): ?\DateTimeImmutable
-    {
-        return $this->updatedAt;
-    }
-
-    #[ORM\PreUpdate]
-    public function setUpdatedAt(): void
-    {
-        $this->updatedAt = new \DateTimeImmutable();
     }
 
     /**

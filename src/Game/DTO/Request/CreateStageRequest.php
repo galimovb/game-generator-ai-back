@@ -1,16 +1,12 @@
 <?php
 
-namespace App\Stage\DTO\Request;
+namespace App\Game\DTO\Request;
 
 use Symfony\Component\Validator\Constraints as Assert;
 
 class CreateStageRequest
 {
     public function __construct(
-        #[Assert\NotBlank]
-        #[Assert\Positive]
-        public readonly int $gameId,
-
         #[Assert\NotBlank]
         #[Assert\Length(min: 3, max: 255)]
         public readonly string $title,

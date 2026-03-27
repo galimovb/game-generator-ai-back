@@ -13,7 +13,6 @@ final readonly class UserRegistrationService
     public function __construct(
         private EntityManagerInterface $entityManager,
         private UserPasswordHasherInterface $passwordHasher,
-        private ValidatorInterface $validator,
         private UserService $userService,
     ) {}
 

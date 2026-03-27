@@ -4,6 +4,8 @@ namespace App\Support\Entity;
 
 use App\Shared\Enum\TicketPriority;
 use App\Shared\Enum\TicketStatus;
+use App\Shared\Trait\AuthorableTrait;
+use App\Shared\Trait\TimestampableTrait;
 use App\Support\Repository\TicketRepository;
 use App\User\Entity\User;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -12,8 +14,11 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: TicketRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 class Ticket
 {
+    use TimestampableTrait;
+    use AuthorableTrait;
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -25,10 +30,6 @@ class Ticket
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
 
-    #[ORM\ManyToOne(inversedBy: 'tickets')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?User $author = null;
-
     #[ORM\ManyToOne(inversedBy: 'assignedTickets')]
     private ?User $assignedTo = null;
 
@@ -37,12 +38,6 @@ class Ticket
 
     #[ORM\Column(enumType: TicketPriority::class)]
     private ?TicketPriority $priority;
-
-    #[ORM\Column]
-    private ?\DateTimeImmutable $createdAt;
-
-    #[ORM\Column(nullable: true)]
-    private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $closedAt = null;
@@ -55,7 +50,6 @@ class Ticket
 
     public function __construct()
     {
-        $this->createdAt = new \DateTimeImmutable();
         $this->status = TicketStatus::OPEN;
         $this->priority = TicketPriority::HIGH;
         $this->messages = new ArrayCollection();
@@ -86,18 +80,6 @@ class Ticket
     public function setDescription(?string $description): static
     {
         $this->description = $description;
-
-        return $this;
-    }
-
-    public function getAuthor(): ?User
-    {
-        return $this->author;
-    }
-
-    public function setAuthor(?User $author): static
-    {
-        $this->author = $author;
 
         return $this;
     }
@@ -134,30 +116,6 @@ class Ticket
     public function setPriority(TicketPriority $priority): static
     {
         $this->priority = $priority;
-
-        return $this;
-    }
-
-    public function getCreatedAt(): ?\DateTimeImmutable
-    {
-        return $this->createdAt;
-    }
-
-    public function setCreatedAt(\DateTimeImmutable $createdAt): static
-    {
-        $this->createdAt = $createdAt;
-
-        return $this;
-    }
-
-    public function getUpdatedAt(): ?\DateTimeImmutable
-    {
-        return $this->updatedAt;
-    }
-
-    public function setUpdatedAt(?\DateTimeImmutable $updatedAt): static
-    {
-        $this->updatedAt = $updatedAt;
 
         return $this;
     }

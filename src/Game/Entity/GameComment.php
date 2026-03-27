@@ -3,14 +3,18 @@
 namespace App\Game\Entity;
 
 use App\Game\Repository\GameCommentRepository;
-use App\User\Entity\User;
+use App\Shared\Trait\AuthorableTrait;
+use App\Shared\Trait\TimestampableTrait;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: GameCommentRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 class GameComment
 {
+    use TimestampableTrait;
+    use AuthorableTrait;
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -19,10 +23,6 @@ class GameComment
     #[ORM\ManyToOne(inversedBy: 'comments')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Game $game = null;
-
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?User $author = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $text = null;
@@ -36,16 +36,9 @@ class GameComment
     #[ORM\OneToMany(targetEntity: self::class, mappedBy: 'parent')]
     private Collection $childComments;
 
-    #[ORM\Column]
-    private ?\DateTimeImmutable $createdAt = null;
-
-    #[ORM\Column(nullable: true)]
-    private ?\DateTimeImmutable $updatedAt = null;
-
     public function __construct()
     {
         $this->childComments = new ArrayCollection();
-        $this->createdAt = new \DateTimeImmutable();
     }
 
     public function getId(): ?int
@@ -61,18 +54,6 @@ class GameComment
     public function setGame(?Game $game): static
     {
         $this->game = $game;
-
-        return $this;
-    }
-
-    public function getAuthor(): ?User
-    {
-        return $this->author;
-    }
-
-    public function setAuthor(?User $author): static
-    {
-        $this->author = $author;
 
         return $this;
     }
@@ -127,30 +108,6 @@ class GameComment
                 $childComment->setParent(null);
             }
         }
-
-        return $this;
-    }
-
-    public function getCreatedAt(): ?\DateTimeImmutable
-    {
-        return $this->createdAt;
-    }
-
-    public function setCreatedAt(\DateTimeImmutable $createdAt): static
-    {
-        $this->createdAt = $createdAt;
-
-        return $this;
-    }
-
-    public function getUpdatedAt(): ?\DateTimeImmutable
-    {
-        return $this->updatedAt;
-    }
-
-    public function setUpdatedAt(?\DateTimeImmutable $updatedAt): static
-    {
-        $this->updatedAt = $updatedAt;
 
         return $this;
     }

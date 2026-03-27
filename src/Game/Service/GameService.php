@@ -6,11 +6,13 @@ use App\Game\DTO\Request\UpdateGameRequest;
 use App\Game\Entity\Game;
 use App\Game\Repository\GameLikeRepository;
 use App\Game\Repository\GameRepository;
+use App\Security\Voter\GameVoter;
 use App\Shared\Enum\ErrorCode;
 use App\Shared\Enum\GameLocationType;
 use App\Shared\Exception\ApiException;
 use App\User\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class GameService
 {
@@ -18,29 +20,8 @@ class GameService
         private readonly EntityManagerInterface $entityManager,
         private readonly GameRepository $gameRepository,
         private readonly GameLikeRepository $gameLikeRepository,
+        private readonly AuthorizationCheckerInterface $authChecker,
     ) {}
-
-    private function attachLikeInfo(array $games, ?User $user): array
-    {
-        if (!$user || empty($games)) {
-            return array_map(fn($game) => [
-                'game' => $game,
-                'isLiked' => false,
-            ], $games);
-        }
-
-        $gameIds = array_map(fn($game) => $game->getId(), $games);
-
-        $likedIds = $this->gameLikeRepository->findLikedGameIds($user, $gameIds);
-        $likedMap = array_flip($likedIds);
-
-        return array_map(function ($game) use ($likedMap) {
-            return [
-                'game' => $game,
-                'isLiked' => isset($likedMap[$game->getId()]),
-            ];
-        }, $games);
-    }
 
     // ==================== ПУБЛИЧНЫЕ МЕТОДЫ ====================
 
@@ -103,21 +84,21 @@ class GameService
     /**
      * @throws \Exception
      */
-    public function getGame(int $id, ?User $user = null): Game
+    public function getGame(int $id): Game
     {
         $game = $this->findGameOrFail($id);
 
         if (!$game->isPublic()) {
-            $this->checkAccess($game, $user);
+            $this->checkAccess($game);
         }
 
         return $game;
     }
 
-    public function updateGame(int $id, UpdateGameRequest $request, User $user): Game
+    public function updateGame(int $id, UpdateGameRequest $request): Game
     {
         $game = $this->findGameOrFail($id);
-        $this->checkAccess($game, $user);
+        $this->checkAccess($game);
 
         if ($request->title !== null) {
             $game->setTitle($request->title);
@@ -156,16 +137,38 @@ class GameService
         return $game;
     }
 
-    public function deleteGame(int $id, User $user): void
+    public function deleteGame(int $id): void
     {
         $game = $this->findGameOrFail($id);
-        $this->checkAccess($game, $user);
+        $this->checkAccess($game);
 
         $this->entityManager->remove($game);
         $this->entityManager->flush();
     }
 
     // ==================== PRIVATE МЕТОДЫ ====================
+
+    private function attachLikeInfo(array $games, ?User $user): array
+    {
+        if (!$user || empty($games)) {
+            return array_map(fn($game) => [
+                'game' => $game,
+                'isLiked' => false,
+            ], $games);
+        }
+
+        $gameIds = array_map(fn($game) => $game->getId(), $games);
+
+        $likedIds = $this->gameLikeRepository->findLikedGameIds($user, $gameIds);
+        $likedMap = array_flip($likedIds);
+
+        return array_map(function ($game) use ($likedMap) {
+            return [
+                'game' => $game,
+                'isLiked' => isset($likedMap[$game->getId()]),
+            ];
+        }, $games);
+    }
 
     private function findGameOrFail(int $id): Game
     {
@@ -176,9 +179,9 @@ class GameService
         return $game;
     }
 
-    private function checkAccess(Game $game, User $user): void
+    private function checkAccess(Game $game): void
     {
-        if (!$user->isAdmin() && !$user->isGameAuthor($game)) {
+        if (!$this->authChecker->isGranted(GameVoter::MANAGE, $game)) {
             throw new ApiException(ErrorCode::FORBIDDEN);
         }
     }

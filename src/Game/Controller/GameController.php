@@ -106,7 +106,7 @@ class GameController extends AbstractController
         int $id,
         #[CurrentUser] ?User $user
     ): JsonResponse {
-            $game = $this->gameService->getGame($id, $user);
+            $game = $this->gameService->getGame($id);
             return ApiResponse::success(GameResponse::fromEntity($game));
     }
 

@@ -74,7 +74,6 @@ class TicketMessageService
         }
 
         $message->setText($dto->text);
-        $message->setUpdatedAt(new \DateTimeImmutable());
 
         $this->em->flush();
 

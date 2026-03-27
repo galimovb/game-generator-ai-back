@@ -4,12 +4,12 @@ namespace App\Game\Service;
 
 use App\Game\DTO\Request\GenerateGameRequest;
 use App\Game\Entity\Game;
+use App\Game\Entity\GameStage;
 use App\Shared\Enum\ErrorCode;
 use App\Shared\Enum\GameLocationType;
 use App\Shared\Enum\UploadType;
 use App\Shared\Exception\ApiException;
 use App\Shared\Service\UploadService;
-use App\Stage\Entity\Stage;
 use App\User\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -168,7 +168,7 @@ PROMPT;
         $this->entityManager->flush();
 
         foreach ($aiData['stages'] ?? [] as $index => $stageData) {
-            $stage = new Stage();
+            $stage = new GameStage();
             $stage->setGame($game);
             $stage->setStageOrder($index + 1);
             $stage->setTitle($stageData['title'] ?? 'Этап ' . ($index + 1));

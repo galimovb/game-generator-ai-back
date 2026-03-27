@@ -1,23 +1,23 @@
 <?php
 
-namespace App\Stage\Repository;
+namespace App\Game\Repository;
 
-use App\Stage\Entity\Stage;
+use App\Game\Entity\GameStage;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Stage>
+ * @extends ServiceEntityRepository<GameStage>
  */
-class StageRepository extends ServiceEntityRepository
+class GameStageRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Stage::class);
+        parent::__construct($registry, GameStage::class);
     }
 
 //    /**
-//     * @return Stage[] Returns an array of Stage objects
+//     * @return GameStage[] Returns an array of GameStage objects
 //     */
 //    public function findByExampleField($value): array
 //    {
@@ -31,7 +31,7 @@ class StageRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?Stage
+//    public function findOneBySomeField($value): ?GameStage
 //    {
 //        return $this->createQueryBuilder('s')
 //            ->andWhere('s.exampleField = :val')

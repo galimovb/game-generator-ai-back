@@ -1,30 +1,29 @@
 <?php
 
-namespace App\Stage\Service;
+namespace App\Game\Service;
 
+use App\Game\DTO\Request\CreateStageRequest;
+use App\Game\DTO\Request\UpdateStageRequest;
 use App\Game\Entity\Game;
-use App\Game\Service\GameService;
+use App\Game\Entity\GameStage;
 use App\Shared\Enum\ErrorCode;
 use App\Shared\Exception\ApiException;
-use App\Stage\DTO\Request\CreateStageRequest;
-use App\Stage\DTO\Request\UpdateStageRequest;
-use App\Stage\Entity\Stage;
 use App\User\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 
-class StageService
+class GameStageService
 {
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly GameService $gameService,
     ) {}
 
-    public function create(CreateStageRequest $request, User $user): Stage
+    public function create(int $gameId, CreateStageRequest $request, User $user): GameStage
     {
-        $game = $this->gameService->getGame($request->gameId, $user);
+        $game = $this->gameService->getGame($gameId);
         $this->checkAccess($game, $user);
 
-        $stage = new Stage();
+        $stage = new GameStage();
         $stage->setGame($game);
         $stage->setStageOrder($this->getNextOrder($game));
         $stage->setTitle($request->title);
@@ -39,12 +38,14 @@ class StageService
         return $stage;
     }
 
-    public function update(?Stage $stage, UpdateStageRequest $request, User $user): Stage
+    public function update(int $gameId, ?GameStage $stage, UpdateStageRequest $request, User $user): GameStage
     {
         if (!$stage) {
             throw new ApiException(ErrorCode::STAGE_NOT_FOUND);
         }
-        $this->checkAccess($stage->getGame(), $user);
+
+        $game = $this->gameService->getGame($gameId);
+        $this->checkAccess($game, $user);
 
         if ($request->title !== null) {
             $stage->setTitle($request->title);
@@ -67,13 +68,14 @@ class StageService
         return $stage;
     }
 
-    public function delete(?Stage $stage, User $user): void
+    public function delete(int $gameId, ?GameStage $stage, User $user): void
     {
         if (!$stage) {
             throw new ApiException(ErrorCode::STAGE_NOT_FOUND);
         }
 
-        $this->checkAccess($stage->getGame(), $user);
+        $game = $this->gameService->getGame($gameId);
+        $this->checkAccess($game, $user);
 
         $this->entityManager->remove($stage);
         $this->entityManager->flush();

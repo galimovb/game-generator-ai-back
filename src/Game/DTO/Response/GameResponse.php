@@ -4,7 +4,6 @@ namespace App\Game\DTO\Response;
 
 use App\Game\Entity\Game;
 use App\Shared\Enum\GameLocationType;
-use App\Stage\DTO\Response\StageResponse;
 use App\User\DTO\Response\UserResponse;
 
 class GameResponse
@@ -50,7 +49,7 @@ class GameResponse
             requisites: $game->getRequisites(),
             isPublic: $game->isPublic(),
             stages: array_map(
-                fn($stage) => StageResponse::fromEntity($stage),
+                fn($stage) => GameStageResponse::fromEntity($stage),
                 $game->getStages()->toArray()
             ),
             commentsCount: count($game->getComments()), //TODO фикс на производительное решение

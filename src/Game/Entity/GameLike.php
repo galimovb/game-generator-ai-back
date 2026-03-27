@@ -3,20 +3,18 @@
 namespace App\Game\Entity;
 
 use App\Game\Repository\GameLikeRepository;
-use App\User\Entity\User;
+use App\Shared\Trait\AuthorableTrait;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: GameLikeRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 class GameLike
 {
+    use AuthorableTrait;
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
-
-    #[ORM\ManyToOne(inversedBy: 'likes')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?User $author = null;
 
     #[ORM\ManyToOne(inversedBy: 'likes')]
     #[ORM\JoinColumn(nullable: false)]
@@ -25,26 +23,9 @@ class GameLike
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
 
-    public function __construct()
-    {
-        $this->createdAt = new \DateTimeImmutable();
-    }
-
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getAuthor(): ?User
-    {
-        return $this->author;
-    }
-
-    public function setAuthor(?User $author): static
-    {
-        $this->author = $author;
-
-        return $this;
     }
 
     public function getGame(): ?Game
@@ -69,5 +50,11 @@ class GameLike
         $this->createdAt = $createdAt;
 
         return $this;
+    }
+
+    #[ORM\PrePersist]
+    public function setCreatedAtValue(): void
+    {
+        $this->createdAt = new \DateTimeImmutable();
     }
 }

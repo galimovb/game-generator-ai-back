@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Stage\DTO\Request;
+namespace App\Game\DTO\Request;
 
 use Symfony\Component\Validator\Constraints as Assert;
 

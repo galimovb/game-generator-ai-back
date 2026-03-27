@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Stage\DTO\Response;
+namespace App\Game\DTO\Response;
 
-use App\Stage\Entity\Stage;
+use App\Game\Entity\GameStage;
 
-class StageResponse
+class GameStageResponse
 {
     public function __construct(
         public readonly int $id,
@@ -17,7 +17,7 @@ class StageResponse
         public readonly string $createdAt,
     ) {}
 
-    public static function fromEntity(Stage $stage): self
+    public static function fromEntity(GameStage $stage): self
     {
         return new self(
             id: $stage->getId(),
