@@ -4,20 +4,20 @@ namespace App\User\DTO\Response;
 
 use App\User\Entity\User;
 
-class UserResponse
+readonly class UserResponse
 {
     public function __construct(
-        public readonly int $id,
-        public readonly ?string $name,
-        public readonly ?string $lastName,
-        public readonly ?string $middleName,
-        public readonly string $email,
-        public readonly ?string $login,
-        public readonly ?string $avatar,
-        public readonly array $roles,
-        public readonly bool $isActive,
-        public readonly bool $isBlocked,
-        public readonly bool $isVerified,
+        public int $id,
+        public ?string $name,
+        public ?string $lastName,
+        public ?string $middleName,
+        public string $email,
+        public ?string $login,
+        public ?string $avatar,
+        public array $roles,
+        public bool $isActive,
+        public bool $isBlocked,
+        public bool $isVerified,
     ) {}
 
     public static function fromEntity(User $user): self

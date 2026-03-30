@@ -35,12 +35,12 @@ class UserService
             $user->setMiddleName($request->middleName);
         }
 
-        if ($request->email !== null) {
+        if ($request->email !== null && $request->email !== $user->getEmail()) {
             $this->checkEmailUnique($request->email);
             $user->setEmail($request->email);
         }
 
-        if ($request->login !== null) {
+        if ($request->login !== null && $request->login !== $user->getLogin()) {
             $this->checkLoginUnique($request->login);
             $user->setLogin($request->login);
         }
@@ -78,23 +78,6 @@ class UserService
         }
 
         return $user;
-    }
-
-    public function getUsers(int $page, int $limit): array
-    {
-        $items = $this->userRepository->findBy(
-            ['isBlocked' => false],
-            ['id' => 'DESC'],
-            $limit,
-            ($page - 1) * $limit
-        );
-
-        $total = $this->userRepository->count(['isBlocked' => false]);
-
-        return [
-            'items' => $items,
-            'total' => $total
-        ];
     }
 
     public function blockUser(int $id, User $admin): void

@@ -5,16 +5,16 @@ namespace App\Game\DTO\Response;
 use App\Game\Entity\GameComment;
 use App\User\DTO\Response\UserResponse;
 
-class GameCommentResponse
+readonly class GameCommentResponse
 {
     public function __construct(
-        public readonly ?int $id,
-        public readonly ?int $gameId,
-        public readonly ?UserResponse $author,
-        public readonly ?string $text,
-        public readonly ?int $parentId,
-        public readonly string $createdAt,
-        public readonly ?string $updatedAt,
+        public ?int $id,
+        public ?int $gameId,
+        public ?UserResponse $author,
+        public ?string $text,
+        public ?int $parentId,
+        public string $createdAt,
+        public ?string $updatedAt,
     ) {}
 
     public static function fromEntity(GameComment $gameComment): self

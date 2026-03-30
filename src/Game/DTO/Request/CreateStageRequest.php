@@ -4,25 +4,25 @@ namespace App\Game\DTO\Request;
 
 use Symfony\Component\Validator\Constraints as Assert;
 
-class CreateStageRequest
+readonly class CreateStageRequest
 {
     public function __construct(
         #[Assert\NotBlank]
         #[Assert\Length(min: 3, max: 255)]
-        public readonly string $title,
+        public string $title,
 
         #[Assert\NotBlank]
         #[Assert\Length(min: 10)]
-        public readonly string $description,
+        public string $description,
 
         #[Assert\NotBlank]
         #[Assert\Positive]
-        public readonly int $duration,
+        public int $duration,
 
         #[Assert\Type('array')]
-        public readonly ?array $tasks = [],
+        public ?array $tasks = [],
 
         #[Assert\Type('array')]
-        public readonly array $props = []
+        public array $props = []
     ) {}
 }

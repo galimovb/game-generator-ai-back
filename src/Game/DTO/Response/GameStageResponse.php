@@ -4,17 +4,17 @@ namespace App\Game\DTO\Response;
 
 use App\Game\Entity\GameStage;
 
-class GameStageResponse
+readonly class GameStageResponse
 {
     public function __construct(
-        public readonly int $id,
-        public readonly int $order,
-        public readonly ?string $title,
-        public readonly ?string $description,
-        public readonly ?int $duration,
-        public readonly ?array $tasks,
-        public readonly ?array $props,
-        public readonly string $createdAt,
+        public int $id,
+        public int $order,
+        public ?string $title,
+        public ?string $description,
+        public ?int $duration,
+        public ?array $tasks,
+        public ?array $props,
+        public string $createdAt,
     ) {}
 
     public static function fromEntity(GameStage $stage): self

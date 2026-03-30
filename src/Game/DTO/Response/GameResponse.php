@@ -6,28 +6,28 @@ use App\Game\Entity\Game;
 use App\Shared\Enum\GameLocationType;
 use App\User\DTO\Response\UserResponse;
 
-class GameResponse
+readonly class GameResponse
 {
     public function __construct(
-        public readonly int $id,
-        public readonly ?string $title,
-        public readonly ?string $description,
-        public readonly ?UserResponse $author,
-        public readonly ?int $minAge,
-        public readonly ?int $maxAge,
-        public readonly ?int $minPlayers,
-        public readonly ?int $maxPlayers,
-        public readonly ?int $duration,
-        public readonly ?GameLocationType $locationType,
-        public readonly ?array $photos,
-        public readonly ?array $requisites,
-        public readonly ?bool $isPublic,
-        public readonly ?array $stages,
-        public readonly ?int $commentsCount,
-        public readonly ?int $likesCount,
-        public readonly ?bool $isLiked,
-        public readonly string $createdAt,
-        public readonly ?string $updatedAt,
+        public int $id,
+        public ?string $title,
+        public ?string $description,
+        public ?UserResponse $author,
+        public ?int $minAge,
+        public ?int $maxAge,
+        public ?int $minPlayers,
+        public ?int $maxPlayers,
+        public ?int $duration,
+        public ?GameLocationType $locationType,
+        public ?array $photos,
+        public ?array $requisites,
+        public ?bool $isPublic,
+        public ?array $stages,
+        public ?int $commentsCount,
+        public ?int $likesCount,
+        public ?bool $isLiked,
+        public string $createdAt,
+        public ?string $updatedAt,
     ) {}
 
     public static function fromEntity(

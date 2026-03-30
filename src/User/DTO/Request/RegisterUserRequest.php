@@ -4,27 +4,27 @@ namespace App\User\DTO\Request;
 
 use Symfony\Component\Validator\Constraints as Assert;
 
-final class RegisterUserRequest
+readonly class RegisterUserRequest
 {
     public function __construct(
         #[Assert\NotBlank]
         #[Assert\Email]
-        public readonly string $email,
+        public string $email,
 
         #[Assert\NotBlank]
         #[Assert\Length(min: 8)]
-        public readonly string $password,
+        public string $password,
 
         #[Assert\Length(max: 255)]
-        public readonly ?string $login = null,
+        public ?string $login = null,
 
         #[Assert\Length(max: 255)]
-        public readonly ?string $name = null,
+        public ?string $name = null,
 
         #[Assert\Length(max: 255)]
-        public readonly ?string $lastName = null,
+        public ?string $lastName = null,
 
         #[Assert\Length(max: 255)]
-        public readonly ?string $middleName = null,
+        public ?string $middleName = null,
     ) {}
 }

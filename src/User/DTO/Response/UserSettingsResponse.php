@@ -5,12 +5,12 @@ namespace App\User\DTO\Response;
 use App\Shared\Enum\ModelType;
 use App\User\Entity\UserSettings;
 
-class UserSettingsResponse
+readonly class UserSettingsResponse
 {
 
     public function __construct(
-        public readonly ?ModelType $generationModel,
-        public readonly ?float $generationCreative,
+        public ?ModelType $generationModel,
+        public ?float $generationCreative,
     ) {}
 
     public static function fromEntity(UserSettings $userSettings): self

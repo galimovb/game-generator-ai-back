@@ -4,22 +4,22 @@ namespace App\Game\DTO\Request;
 
 use Symfony\Component\Validator\Constraints as Assert;
 
-class UpdateStageRequest
+readonly class UpdateStageRequest
 {
     public function __construct(
         #[Assert\Length(min: 3, max: 255)]
-        public readonly ?string $title = null,
+        public ?string $title = null,
 
         #[Assert\Length(min: 10)]
-        public readonly ?string $description = null,
+        public ?string $description = null,
 
         #[Assert\Positive]
-        public readonly ?int $duration = null,
+        public ?int $duration = null,
 
         #[Assert\Type('array')]
-        public readonly ?array $tasks = null,
+        public ?array $tasks = null,
 
         #[Assert\Type('array')]
-        public readonly ?array $props = null
+        public ?array $props = null
     ) {}
 }

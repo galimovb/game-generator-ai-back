@@ -10,6 +10,7 @@ use App\Support\Service\TicketMessageService;
 use App\User\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
@@ -20,6 +21,30 @@ class TicketMessageController extends AbstractController
     public function __construct(
         private readonly TicketMessageService $messageService
     ) {}
+
+    #[Route('', name: 'list', methods: ['GET'])]
+    public function getList(
+        int $ticketId,
+        Request $request,
+        #[CurrentUser] User $user
+    ): JsonResponse {
+        $page = $request->query->getInt('page', 1);
+        $limit = $request->query->getInt('limit', 50);
+
+        $result = $this->messageService->getMessages($ticketId, $user, $page, $limit);
+
+        return ApiResponse::success([
+            'items' => array_map(
+                fn($message) => TicketMessageResponse::fromEntity($message),
+                $result['items']
+            ),
+            'pagination' => [
+                'page' => $page,
+                'limit' => $limit,
+                'total' => $result['total']
+            ]
+        ]);
+    }
 
     #[Route('', name: 'create', methods: ['POST'])]
     public function create(

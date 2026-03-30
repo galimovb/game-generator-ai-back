@@ -25,6 +25,8 @@ enum ErrorCode: string
     case TOKEN_INVALID = 'TOKEN_INVALID';
     case TOKEN_MISSING = 'TOKEN_MISSING';
 
+    case TICKET_ALREADY_CLOSED = 'TICKET_ALREADY_CLOSED';
+
     public function getMessage(): string
     {
         return match($this) {
@@ -45,14 +47,15 @@ enum ErrorCode: string
             self::INVALID_CREDENTIALS => 'Неверный email или пароль',
             self::TOKEN_EXPIRED => 'Устаревший токен',
             self::TOKEN_INVALID => 'Некорректный токен',
-            self::TOKEN_MISSING => 'Отсутствует токен авторизации'
+            self::TOKEN_MISSING => 'Отсутствует токен авторизации',
+            self::TICKET_ALREADY_CLOSED => 'Тикет уже закрыт',
         };
     }
 
     public function getHttpCode(): int
     {
         return match($this) {
-            self::EMAIL_EXIST, self::LOGIN_EXIST, self::VALIDATION_FAILED, self::LIKE_EXIST => 422,
+            self::EMAIL_EXIST, self::LOGIN_EXIST, self::VALIDATION_FAILED, self::LIKE_EXIST, self::TICKET_ALREADY_CLOSED => 422,
             self::UNAUTHORIZED, self::INVALID_CREDENTIALS, self::TOKEN_EXPIRED, self::TOKEN_INVALID, self::TOKEN_MISSING   => 401,
             self::FORBIDDEN => 403,
             self::NOT_FOUND, self::COMMENT_NOT_FOUND, self::GAME_NOT_FOUND, self::STAGE_NOT_FOUND, self::USER_NOT_FOUND, self::LIKE_NOT_FOUND => 404,

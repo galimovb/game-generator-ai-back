@@ -8,52 +8,66 @@ use App\Shared\Enum\TicketStatus;
 use App\Shared\Exception\ApiException;
 use App\Support\DTO\Request\CreateTicketMessageRequest;
 use App\Support\DTO\Request\UpdateTicketMessageRequest;
+use App\Support\Entity\Ticket;
 use App\Support\Entity\TicketMessage;
 use App\Support\Repository\TicketMessageRepository;
-use App\Support\Repository\TicketRepository;
 use App\User\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 
 class TicketMessageService
 {
     public function __construct(
-        private readonly TicketRepository $ticketRepo,
         private readonly TicketMessageRepository $messageRepo,
-        private readonly EntityManagerInterface $em
+        private readonly EntityManagerInterface $em,
+        private readonly TicketAccessService $accessService, // Используем общий
     ) {}
+
+    public function getMessages(int $ticketId, User $user, int $page, int $limit): array
+    {
+        $ticket = $this->accessService->findTicketOrFail($ticketId);
+
+        if (!$this->accessService->canViewTicket($ticket, $user)) {
+            throw new ApiException(ErrorCode::FORBIDDEN);
+        }
+
+        $offset = ($page - 1) * $limit;
+
+        $items = $this->messageRepo->findBy(
+            ['ticket' => $ticket],
+            ['createdAt' => 'ASC'],
+            $limit,
+            $offset
+        );
+
+        $total = $this->messageRepo->count(['ticket' => $ticket]);
+
+        return [
+            'items' => $items,
+            'total' => $total
+        ];
+    }
 
     public function createMessage(int $ticketId, CreateTicketMessageRequest $dto, User $user): TicketMessage
     {
-        $ticket = $this->ticketRepo->find($ticketId);
+        $ticket = $this->accessService->findTicketOrFail($ticketId);
 
-        if (!$ticket) {
-            throw new ApiException(ErrorCode::NOT_FOUND);
-        }
-
-        $isSupport = in_array('ROLE_SUPPORT', $user->getRoles());
+        $isSupport = $this->accessService->isSupport($user);
 
         if (!$isSupport && $ticket->getAuthor()->getId() !== $user->getId()) {
             throw new ApiException(ErrorCode::FORBIDDEN);
         }
 
+        if ($ticket->getStatus() === TicketStatus::CLOSED) {
+            throw new ApiException(ErrorCode::TICKET_ALREADY_CLOSED);
+        }
+
         $message = new TicketMessage();
         $message->setTicket($ticket);
-        $message->setOwner($user);
+        $message->setAuthor($user);
         $message->setText($dto->text);
         $message->setMessageType($isSupport ? TicketMessageType::SUPPORT : TicketMessageType::USER);
 
-        // статусная логика
-        if ($isSupport) {
-            $ticket->setStatus(
-                $ticket->getStatus() === TicketStatus::OPEN
-                    ? TicketStatus::IN_PROGRESS
-                    : TicketStatus::WAITING_FOR_USER
-            );
-        } else {
-            if ($ticket->getStatus() === TicketStatus::WAITING_FOR_USER) {
-                $ticket->setStatus(TicketStatus::IN_PROGRESS);
-            }
-        }
+        $this->updateTicketStatusOnMessage($ticket, $isSupport);
 
         $this->em->persist($message);
         $this->em->flush();
@@ -63,14 +77,19 @@ class TicketMessageService
 
     public function updateMessage(int $id, UpdateTicketMessageRequest $dto, User $user): TicketMessage
     {
-        $message = $this->messageRepo->find($id);
+        $message = $this->findMessageOrFail($id);
 
-        if (!$message) {
-            throw new ApiException(ErrorCode::NOT_FOUND);
+        if ($message->getAuthor()?->getId() !== $user->getId()) {
+            throw new ApiException(ErrorCode::FORBIDDEN);
         }
 
-        if ($message->getOwner()?->getId() !== $user->getId()) {
+        if ($message->getMessageType() === TicketMessageType::SYSTEM) {
             throw new ApiException(ErrorCode::FORBIDDEN);
+        }
+
+        $ticket = $message->getTicket();
+        if ($ticket->getStatus() === TicketStatus::CLOSED) {
+            throw new ApiException(ErrorCode::TICKET_ALREADY_CLOSED);
         }
 
         $message->setText($dto->text);
@@ -82,28 +101,61 @@ class TicketMessageService
 
     public function deleteMessage(int $id, User $user): void
     {
-        $message = $this->messageRepo->find($id);
+        $message = $this->findMessageOrFail($id);
 
-        if (!$message) {
-            throw new ApiException(ErrorCode::NOT_FOUND);
+        if ($message->getAuthor()?->getId() !== $user->getId()) {
+            throw new ApiException(ErrorCode::FORBIDDEN);
         }
 
-        if ($message->getOwner()?->getId() !== $user->getId()) {
+        if ($message->getMessageType() === TicketMessageType::SYSTEM) {
             throw new ApiException(ErrorCode::FORBIDDEN);
+        }
+
+        $ticket = $message->getTicket();
+        if ($ticket->getStatus() === TicketStatus::CLOSED) {
+            throw new ApiException(ErrorCode::TICKET_ALREADY_CLOSED);
         }
 
         $this->em->remove($message);
         $this->em->flush();
     }
 
-    public function createSystemMessage($ticket, array $payload): void
+    public function createSystemMessage(Ticket $ticket, array $payload): void
     {
         $message = new TicketMessage();
         $message->setTicket($ticket);
-        $message->setOwner(null);
+        $message->setAuthor(null);
         $message->setMessageType(TicketMessageType::SYSTEM);
-        $message->setText(json_encode($payload));
+        $message->setText(json_encode($payload, JSON_UNESCAPED_UNICODE));
 
         $this->em->persist($message);
+    }
+
+    // ==================== PRIVATE МЕТОДЫ ====================
+
+    private function findMessageOrFail(int $id): TicketMessage
+    {
+        $message = $this->messageRepo->find($id);
+
+        if (!$message) {
+            throw new ApiException(ErrorCode::NOT_FOUND);
+        }
+
+        return $message;
+    }
+
+    private function updateTicketStatusOnMessage(Ticket $ticket, bool $isSupport): void
+    {
+        if ($isSupport) {
+            $ticket->setStatus(
+                $ticket->getStatus() === TicketStatus::OPEN
+                    ? TicketStatus::IN_PROGRESS
+                    : TicketStatus::WAITING_FOR_USER
+            );
+        } else {
+            if ($ticket->getStatus() === TicketStatus::WAITING_FOR_USER) {
+                $ticket->setStatus(TicketStatus::IN_PROGRESS);
+            }
+        }
     }
 }

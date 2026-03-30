@@ -5,19 +5,19 @@ namespace App\Support\DTO\Response;
 use App\Support\Entity\Ticket;
 use App\User\DTO\Response\UserResponse;
 
-class TicketResponse
+readonly class TicketResponse
 {
     public function __construct(
-        public readonly int $id,
-        public readonly string $subject,
-        public readonly ?string $description,
-        public readonly string $status,
-        public readonly string $priority,
-        public readonly UserResponse $author,
-        public readonly ?UserResponse $assignedTo,
-        public readonly string $createdAt,
-        public readonly ?string $updatedAt,
-        public readonly ?string $closedAt,
+        public int $id,
+        public string $subject,
+        public ?string $description,
+        public string $status,
+        public string $priority,
+        public UserResponse $author,
+        public ?UserResponse $assignedTo,
+        public string $createdAt,
+        public ?string $updatedAt,
+        public ?string $closedAt,
     ) {}
 
     public static function fromEntity(Ticket $ticket): self
@@ -29,12 +29,10 @@ class TicketResponse
             status: $ticket->getStatus()->value,
             priority: $ticket->getPriority()->value,
             author: UserResponse::fromEntity($ticket->getAuthor()),
-            assignedTo: $ticket->getAssignedTo()
-                ? UserResponse::fromEntity($ticket->getAssignedTo())
-                : null,
-            createdAt: $ticket->getCreatedAt()->format(DATE_ATOM),
-            updatedAt: $ticket->getUpdatedAt()?->format(DATE_ATOM),
-            closedAt: $ticket->getClosedAt()?->format(DATE_ATOM),
+            assignedTo: $ticket->getAssignedTo() ? UserResponse::fromEntity($ticket->getAssignedTo()) : null,
+            createdAt: $ticket->getCreatedAt()->format('c'),
+            updatedAt: $ticket->getUpdatedAt()?->format('c'),
+            closedAt: $ticket->getClosedAt()?->format('c'),
         );
     }
 }
