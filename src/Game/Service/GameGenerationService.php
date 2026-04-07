@@ -16,23 +16,25 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class GameGenerationService
 {
-    private const API_URL = 'https://routerai.ru/api/v1';
-    private const MODEL = 'qwen/qwen3-vl-8b-thinking';
-
     public function __construct(
         private readonly HttpClientInterface $httpClient,
         private readonly EntityManagerInterface $entityManager,
         private readonly string $aiApiKey,
+        private readonly string $aiApiUrl,
         private readonly UploadService $uploadService,
     ) {}
 
     public function generateAndSave(GenerateGameRequest $request, User $author): Game
     {
+        // Получаем настройки пользователя (всегда существуют)
+        $settings = $author->getUserSettings();
+        $model = $settings->getGenerationModel()->value;
+        $creative = $settings->getGenerationCreative();
+
         // Сохраняем фото перед отправкой в AI
         $savedPhotos = $this->saveRequestPhotos($request, $author->getId());
 
-        // Отправляем в AI с сохраненными фото
-        $aiData = $this->callVLM($request, $request->photos);
+        $aiData = $this->callVLM($request, $request->photos, $model, $creative);
 
         // Сохраняем игру с путями к фото
         return $this->saveGame($aiData, $author, $request, $savedPhotos);
@@ -58,7 +60,7 @@ class GameGenerationService
         return $savedPaths;
     }
 
-    private function callVLM(GenerateGameRequest $request, array $requestPhotos): array
+    private function callVLM(GenerateGameRequest $request, array $requestPhotos, string $model, float $creative): array
     {
         $userContent = [
             [
@@ -77,13 +79,13 @@ class GameGenerationService
             ];
         }
 
-        $response = $this->httpClient->request('POST', self::API_URL . '/chat/completions', [
+        $response = $this->httpClient->request('POST', $this->aiApiUrl . '/chat/completions', [
             'headers' => [
                 'Authorization' => 'Bearer ' . $this->aiApiKey,
                 'Content-Type' => 'application/json',
             ],
             'json' => [
-                'model' => self::MODEL,
+                'model' => $model,
                 'messages' => [
                     [
                         'role' => 'system',
@@ -94,8 +96,8 @@ class GameGenerationService
                         'content' => $userContent
                     ]
                 ],
-                'temperature' => 0.8,
-                'max_tokens' => 2000,
+                'temperature' => $creative,
+                'max_tokens' => 10000,
                 'response_format' => ['type' => 'json_object'],
             ],
             'timeout' => 60,

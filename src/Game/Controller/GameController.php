@@ -39,7 +39,7 @@ class GameController extends AbstractController
             $page = $request->query->getInt('page', 1);
             $limit = $request->query->getInt('limit', 20);
 
-            $result = $this->gameService->getPublicGames($page, $limit);
+            $result = $this->gameService->getPublicGames($page, $limit, $user);
 
             return ApiResponse::success([
                 'items' => array_map(

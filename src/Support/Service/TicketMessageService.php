@@ -5,7 +5,9 @@ namespace App\Support\Service;
 use App\Shared\Enum\ErrorCode;
 use App\Shared\Enum\TicketMessageType;
 use App\Shared\Enum\TicketStatus;
+use App\Shared\Enum\UploadType;
 use App\Shared\Exception\ApiException;
+use App\Shared\Service\UploadService;
 use App\Support\DTO\Request\CreateTicketMessageRequest;
 use App\Support\DTO\Request\UpdateTicketMessageRequest;
 use App\Support\Entity\Ticket;
@@ -19,7 +21,8 @@ class TicketMessageService
     public function __construct(
         private readonly TicketMessageRepository $messageRepo,
         private readonly EntityManagerInterface $em,
-        private readonly TicketAccessService $accessService, // Используем общий
+        private readonly TicketAccessService $accessService,
+        private UploadService $uploadService,
     ) {}
 
     public function getMessages(int $ticketId, User $user, int $page, int $limit): array
@@ -34,7 +37,7 @@ class TicketMessageService
 
         $items = $this->messageRepo->findBy(
             ['ticket' => $ticket],
-            ['createdAt' => 'ASC'],
+            ['createdAt' => 'DESC'],
             $limit,
             $offset
         );
@@ -69,6 +72,19 @@ class TicketMessageService
 
         $this->updateTicketStatusOnMessage($ticket, $isSupport);
 
+        $photos = [];
+        foreach ($dto->photos as $photoBase64) {
+            $photoPath = $this->uploadService->uploadFromBase64(
+                $photoBase64,
+                UploadType::TICKET_PHOTO,
+                $ticket->getId()
+            );
+            $photos[] = $photoPath;
+        }
+
+        if (!empty($photos)) {
+            $message->setPhotos($photos);
+        }
         $this->em->persist($message);
         $this->em->flush();
 

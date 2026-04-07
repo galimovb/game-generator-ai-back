@@ -9,6 +9,13 @@ readonly class UpdateTicketMessageRequest
     public function __construct(
         #[Assert\NotBlank]
         #[Assert\Length(min: 1, max: 5000)]
-        public string $text
+        public string $text,
+
+        #[Assert\All([
+            new Assert\NotBlank,
+            new Assert\Type('string'),
+            new Assert\Regex('/^data:image\/(jpeg|png|webp|gif);base64,/')
+        ])]
+        public array $photos = [],
     ) {}
 }
