@@ -7,6 +7,7 @@ use App\Game\Entity\Game;
 use App\Game\Repository\GameLikeRepository;
 use App\Game\Repository\GameRepository;
 use App\Security\Voter\GameVoter;
+use App\Shared\Enum\ActivityLevel;
 use App\Shared\Enum\ErrorCode;
 use App\Shared\Enum\GameLocationType;
 use App\Shared\Exception\ApiException;
@@ -22,8 +23,6 @@ class GameService
         private readonly GameLikeRepository $gameLikeRepository,
         private readonly AuthorizationCheckerInterface $authChecker,
     ) {}
-
-    // ==================== ПУБЛИЧНЫЕ МЕТОДЫ ====================
 
     public function getPublicGames(int $page, int $limit, ?User $user = null): array
     {
@@ -81,9 +80,6 @@ class GameService
         ];
     }
 
-    /**
-     * @throws \Exception
-     */
     public function getGame(int $id): Game
     {
         $game = $this->findGameOrFail($id);
@@ -106,23 +102,26 @@ class GameService
         if ($request->description !== null) {
             $game->setDescription($request->description);
         }
-        if ($request->minAge !== null) {
-            $game->setMinAge($request->minAge);
+        if ($request->age !== null) {
+            $game->setAge($request->age);
         }
-        if ($request->maxAge !== null) {
-            $game->setMaxAge($request->maxAge);
-        }
-        if ($request->minPlayers !== null) {
-            $game->setMinPlayers($request->minPlayers);
-        }
-        if ($request->maxPlayers !== null) {
-            $game->setMaxPlayers($request->maxPlayers);
+        if ($request->players !== null) {
+            $game->setPlayers($request->players);
         }
         if ($request->duration !== null) {
             $game->setDuration($request->duration);
         }
         if ($request->locationType !== null) {
             $game->setLocationType(GameLocationType::from($request->locationType));
+        }
+        if ($request->fieldWidth !== null) {
+            $game->setFieldWidth($request->fieldWidth);
+        }
+        if ($request->fieldLength !== null) {
+            $game->setFieldLength($request->fieldLength);
+        }
+        if ($request->activityLevel !== null) {
+            $game->setActivityLevel(ActivityLevel::from($request->activityLevel));
         }
         if ($request->requisites !== null) {
             $game->setRequisites($request->requisites);
@@ -146,8 +145,6 @@ class GameService
         $this->entityManager->flush();
     }
 
-    // ==================== PRIVATE МЕТОДЫ ====================
-
     private function attachLikeInfo(array $games, ?User $user): array
     {
         if (!$user || empty($games)) {
@@ -158,7 +155,6 @@ class GameService
         }
 
         $gameIds = array_map(fn($game) => $game->getId(), $games);
-
         $likedIds = $this->gameLikeRepository->findLikedGameIds($user, $gameIds);
         $likedMap = array_flip($likedIds);
 

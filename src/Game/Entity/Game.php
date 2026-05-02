@@ -17,6 +17,7 @@ class Game
 {
     use TimestampableTrait;
     use AuthorableTrait;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -29,16 +30,10 @@ class Game
     private ?string $description = null;
 
     #[ORM\Column(nullable: true)]
-    private ?int $minAge = null;
+    private ?int $age = null;
 
     #[ORM\Column(nullable: true)]
-    private ?int $maxAge = null;
-
-    #[ORM\Column(nullable: true)]
-    private ?int $minPlayers = null;
-
-    #[ORM\Column(nullable: true)]
-    private ?int $maxPlayers = null;
+    private ?int $players = null;
 
     #[ORM\Column(nullable: true)]
     private ?int $duration = null;
@@ -46,60 +41,32 @@ class Game
     #[ORM\Column(length: 20, nullable: true, enumType: GameLocationType::class)]
     private ?GameLocationType $locationType = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?int $fieldWidth = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $fieldLength = null;
+
+    #[ORM\Column(length: 20, nullable: true)]
+    private ?string $activityLevel = null;
+
     #[ORM\Column(type: Types::JSON, nullable: true)]
     private ?array $photos = null;
 
-    #[ORM\OneToMany(mappedBy: 'game', targetEntity: GameStage::class, cascade: ['persist', 'remove'])]
-    private Collection $stages;
-
     #[ORM\Column(nullable: true)]
-    private ?array $requisites;
+    private ?array $requisites = null;
 
     #[ORM\Column]
     private bool $isPublic = false;
 
-    /**
-     * @var Collection<int, GameComment>
-     */
+    #[ORM\OneToMany(mappedBy: 'game', targetEntity: GameStage::class, cascade: ['persist', 'remove'])]
+    private Collection $stages;
+
     #[ORM\OneToMany(targetEntity: GameComment::class, mappedBy: 'game', orphanRemoval: true)]
     private Collection $comments;
 
-    /**
-     * @var Collection<int, GameLike>
-     */
     #[ORM\OneToMany(targetEntity: GameLike::class, mappedBy: 'game', orphanRemoval: true)]
     private Collection $likes;
-
-    public function isPublic(): bool
-    {
-        return $this->isPublic;
-    }
-
-    public function setIsPublic(bool $isPublic): void
-    {
-        $this->isPublic = $isPublic;
-    }
-
-    public function getRequisites(): ?array
-    {
-        return $this->requisites;
-    }
-
-    public function setRequisites(?array $requisites): void
-    {
-        $this->requisites = $requisites;
-    }
-
-    public function getStages(): Collection
-    {
-        return $this->stages;
-    }
-
-    public function setStages(Collection $stages): void
-    {
-        $this->stages = $stages;
-    }
-
 
     public function __construct()
     {
@@ -135,47 +102,25 @@ class Game
         return $this;
     }
 
-    public function getMinAge(): ?int
+    public function getAge(): ?int
     {
-        return $this->minAge;
+        return $this->age;
     }
 
-    public function setMinAge(?int $minAge): static
+    public function setAge(?int $age): static
     {
-        $this->minAge = $minAge;
+        $this->age = $age;
         return $this;
     }
 
-    public function getMaxAge(): ?int
+    public function getPlayers(): ?int
     {
-        return $this->maxAge;
+        return $this->players;
     }
 
-    public function setMaxAge(?int $maxAge): static
+    public function setPlayers(?int $players): static
     {
-        $this->maxAge = $maxAge;
-        return $this;
-    }
-
-    public function getMinPlayers(): ?int
-    {
-        return $this->minPlayers;
-    }
-
-    public function setMinPlayers(?int $minPlayers): static
-    {
-        $this->minPlayers = $minPlayers;
-        return $this;
-    }
-
-    public function getMaxPlayers(): ?int
-    {
-        return $this->maxPlayers;
-    }
-
-    public function setMaxPlayers(?int $maxPlayers): static
-    {
-        $this->maxPlayers = $maxPlayers;
+        $this->players = $players;
         return $this;
     }
 
@@ -195,9 +140,43 @@ class Game
         return $this->locationType;
     }
 
-    public function setLocationType(?GameLocationType $locationType): void
+    public function setLocationType(?GameLocationType $locationType): static
     {
         $this->locationType = $locationType;
+        return $this;
+    }
+
+    public function getFieldWidth(): ?int
+    {
+        return $this->fieldWidth;
+    }
+
+    public function setFieldWidth(?int $fieldWidth): static
+    {
+        $this->fieldWidth = $fieldWidth;
+        return $this;
+    }
+
+    public function getFieldLength(): ?int
+    {
+        return $this->fieldLength;
+    }
+
+    public function setFieldLength(?int $fieldLength): static
+    {
+        $this->fieldLength = $fieldLength;
+        return $this;
+    }
+
+    public function getActivityLevel(): ?string
+    {
+        return $this->activityLevel;
+    }
+
+    public function setActivityLevel(?string $activityLevel): static
+    {
+        $this->activityLevel = $activityLevel;
+        return $this;
     }
 
     public function getPhotos(): ?array
@@ -211,9 +190,39 @@ class Game
         return $this;
     }
 
-    /**
-     * @return Collection<int, GameComment>
-     */
+    public function getRequisites(): ?array
+    {
+        return $this->requisites;
+    }
+
+    public function setRequisites(?array $requisites): static
+    {
+        $this->requisites = $requisites;
+        return $this;
+    }
+
+    public function isPublic(): bool
+    {
+        return $this->isPublic;
+    }
+
+    public function setIsPublic(bool $isPublic): static
+    {
+        $this->isPublic = $isPublic;
+        return $this;
+    }
+
+    public function getStages(): Collection
+    {
+        return $this->stages;
+    }
+
+    public function setStages(Collection $stages): static
+    {
+        $this->stages = $stages;
+        return $this;
+    }
+
     public function getComments(): Collection
     {
         return $this->comments;
@@ -225,25 +234,17 @@ class Game
             $this->comments->add($comment);
             $comment->setGame($this);
         }
-
         return $this;
     }
 
     public function removeComment(GameComment $comment): static
     {
-        if ($this->comments->removeElement($comment)) {
-            // set the owning side to null (unless already changed)
-            if ($comment->getGame() === $this) {
-                $comment->setGame(null);
-            }
+        if ($this->comments->removeElement($comment) && $comment->getGame() === $this) {
+            $comment->setGame(null);
         }
-
         return $this;
     }
 
-    /**
-     * @return Collection<int, GameLike>
-     */
     public function getLikes(): Collection
     {
         return $this->likes;
@@ -255,19 +256,14 @@ class Game
             $this->likes->add($like);
             $like->setGame($this);
         }
-
         return $this;
     }
 
     public function removeLike(GameLike $like): static
     {
-        if ($this->likes->removeElement($like)) {
-            // set the owning side to null (unless already changed)
-            if ($like->getGame() === $this) {
-                $like->setGame(null);
-            }
+        if ($this->likes->removeElement($like) && $like->getGame() === $this) {
+            $like->setGame(null);
         }
-
         return $this;
     }
 }

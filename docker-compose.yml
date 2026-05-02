@@ -9,21 +9,6 @@ services:
     container_name: symfony_php
     volumes:
       - .:/var/www
-    depends_on:
-      - python
-
-  python:
-    build:
-      context: .
-      dockerfile: docker/python/Dockerfile
-    container_name: python_service
-    volumes:
-      - ./llm:/app
-      - ./llm/models:/app/models
-      - ./llm/lora:/app/lora
-    ports:
-      - "8001:8000"
-    restart: unless-stopped
 
   nginx:
     image: nginx:latest
@@ -37,7 +22,7 @@ services:
       - php
     restart: unless-stopped
 
-###> doctrine/doctrine-bundle ###
+  ###> doctrine/doctrine-bundle ###
   database:
     image: postgres:${POSTGRES_VERSION:-16}-alpine
     environment:
@@ -57,6 +42,6 @@ services:
 ###< doctrine/doctrine-bundle ###
 
 volumes:
-###> doctrine/doctrine-bundle ###
+  ###> doctrine/doctrine-bundle ###
   database_data:
 ###< doctrine/doctrine-bundle ###

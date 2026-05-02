@@ -81,34 +81,4 @@ class GameComment
 
         return $this;
     }
-
-    /**
-     * @return Collection<int, self>
-     */
-    public function getChildComments(): Collection
-    {
-        return $this->childComments;
-    }
-
-    public function addChildComment(self $childComment): static
-    {
-        if (!$this->childComments->contains($childComment)) {
-            $this->childComments->add($childComment);
-            $childComment->setParent($this);
-        }
-
-        return $this;
-    }
-
-    public function removeChildComment(self $childComment): static
-    {
-        if ($this->childComments->removeElement($childComment)) {
-            // set the owning side to null (unless already changed)
-            if ($childComment->getParent() === $this) {
-                $childComment->setParent(null);
-            }
-        }
-
-        return $this;
-    }
 }

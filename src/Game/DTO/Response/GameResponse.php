@@ -3,6 +3,7 @@
 namespace App\Game\DTO\Response;
 
 use App\Game\Entity\Game;
+use App\Shared\Enum\GameActivityLevel;
 use App\Shared\Enum\GameLocationType;
 use App\User\DTO\Response\UserResponse;
 
@@ -13,12 +14,13 @@ readonly class GameResponse
         public ?string $title,
         public ?string $description,
         public ?UserResponse $author,
-        public ?int $minAge,
-        public ?int $maxAge,
-        public ?int $minPlayers,
-        public ?int $maxPlayers,
+        public ?int $age,
+        public ?int $players,
         public ?int $duration,
         public ?GameLocationType $locationType,
+        public ?int $fieldWidth,
+        public ?int $fieldLength,
+        public ?GameActivityLevel $activityLevel,
         public ?array $photos,
         public ?array $requisites,
         public ?bool $isPublic,
@@ -38,13 +40,14 @@ readonly class GameResponse
             id: $game->getId(),
             title: $game->getTitle(),
             description: $game->getDescription(),
-            author: UserResponse::fromEntity($game->getAuthor()),
-            minAge: $game->getMinAge(),
-            maxAge: $game->getMaxAge(),
-            minPlayers: $game->getMinPlayers(),
-            maxPlayers: $game->getMaxPlayers(),
+            author: $game->getAuthor() ? UserResponse::fromEntity($game->getAuthor()) : null,
+            age: $game->getAge(),
+            players: $game->getPlayers(),
             duration: $game->getDuration(),
             locationType: $game->getLocationType(),
+            fieldWidth: $game->getFieldWidth(),
+            fieldLength: $game->getFieldLength(),
+            activityLevel: $game->getActivityLevel(),
             photos: $game->getPhotos(),
             requisites: $game->getRequisites(),
             isPublic: $game->isPublic(),
@@ -52,8 +55,8 @@ readonly class GameResponse
                 fn($stage) => GameStageResponse::fromEntity($stage),
                 $game->getStages()->toArray()
             ),
-            commentsCount: count($game->getComments()), //TODO фикс на производительное решение
-            likesCount: count($game->getLikes()),       //TODO фикс на производительное решение
+            commentsCount: count($game->getComments()),
+            likesCount: count($game->getLikes()),
             isLiked: $isLiked,
             createdAt: $game->getCreatedAt()->format('c'),
             updatedAt: $game->getUpdatedAt()?->format('c'),

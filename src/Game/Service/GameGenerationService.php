@@ -5,6 +5,7 @@ namespace App\Game\Service;
 use App\Game\DTO\Request\GenerateGameRequest;
 use App\Game\Entity\Game;
 use App\Game\Entity\GameStage;
+use App\Shared\Enum\ActivityLevel;
 use App\Shared\Enum\ErrorCode;
 use App\Shared\Enum\GameLocationType;
 use App\Shared\Enum\UploadType;
@@ -12,6 +13,7 @@ use App\Shared\Exception\ApiException;
 use App\Shared\Service\UploadService;
 use App\User\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class GameGenerationService
@@ -22,33 +24,26 @@ class GameGenerationService
         private readonly string $aiApiKey,
         private readonly string $aiApiUrl,
         private readonly UploadService $uploadService,
+        private readonly LoggerInterface $logger,
     ) {}
 
     public function generateAndSave(GenerateGameRequest $request, User $author): Game
     {
-        // Получаем настройки пользователя (всегда существуют)
         $settings = $author->getUserSettings();
         $model = $settings->getGenerationModel()->value;
         $creative = $settings->getGenerationCreative();
 
-        // Сохраняем фото перед отправкой в AI
         $savedPhotos = $this->saveRequestPhotos($request, $author->getId());
+        $aiData = $this->callVLM($request, $savedPhotos, $model, $creative);
 
-        $aiData = $this->callVLM($request, $request->photos, $model, $creative);
-
-        // Сохраняем игру с путями к фото
         return $this->saveGame($aiData, $author, $request, $savedPhotos);
     }
 
-    /**
-     * Сохраняет фотографии из запроса
-     * @return array<string> Массив путей к сохраненным фото
-     */
     private function saveRequestPhotos(GenerateGameRequest $request, int $authorId): array
     {
         $savedPaths = [];
 
-        foreach ($request->photos as $index => $photo) {
+        foreach ($request->photos as $photo) {
             $path = $this->uploadService->uploadFromBase64(
                 $photo,
                 UploadType::REQUEST_PHOTO,
@@ -62,14 +57,14 @@ class GameGenerationService
 
     private function callVLM(GenerateGameRequest $request, array $requestPhotos, string $model, float $creative): array
     {
+        $prompt = $this->buildPrompt($request);
         $userContent = [
             [
                 'type' => 'text',
-                'text' => $this->buildPrompt($request)
+                'text' => $prompt
             ]
         ];
 
-        // Используем сохраненные фото
         foreach ($requestPhotos as $photo) {
             $userContent[] = [
                 'type' => 'image_url',
@@ -78,6 +73,19 @@ class GameGenerationService
                 ]
             ];
         }
+
+        $this->logger->info('AI Generation Request', [
+            'age' => $request->age,
+            'players' => $request->players,
+            'duration' => $request->duration,
+            'locationType' => $request->locationType,
+            'fieldWidth' => $request->fieldWidth,
+            'fieldLength' => $request->fieldLength,
+            'activityLevel' => $request->activityLevel,
+            'model' => $model,
+            'creative' => $creative,
+            'photos_count' => count($requestPhotos),
+        ]);
 
         $response = $this->httpClient->request('POST', $this->aiApiUrl . '/chat/completions', [
             'headers' => [
@@ -97,17 +105,27 @@ class GameGenerationService
                     ]
                 ],
                 'temperature' => $creative,
-                'max_tokens' => 10000,
+                'max_tokens' => 4000,
                 'response_format' => ['type' => 'json_object'],
             ],
-            'timeout' => 60,
+            'timeout' => 120,
         ]);
 
         $data = $response->toArray();
         $content = $data['choices'][0]['message']['content'] ?? '{}';
+
+        $this->logger->info('AI Response', [
+            'content_length' => strlen($content),
+            'content_preview' => substr($content, 0, 500)
+        ]);
+
         $result = json_decode($content, true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
+            $this->logger->error('Invalid JSON from AI', [
+                'error' => json_last_error_msg(),
+                'content' => substr($content, 0, 1000)
+            ]);
             throw new ApiException(ErrorCode::GENERATION_FAILED);
         }
 
@@ -116,38 +134,83 @@ class GameGenerationService
 
     private function buildPrompt(GenerateGameRequest $request): string
     {
-        $propsText = '';
-        if (!empty($request->requisites)) {
-            $propsList = implode(', ', $request->requisites);
-            $propsText = "Доступный реквизит: $propsList";
-        } else {
-            $propsText = "Реквизит не указан, придумай игры без специального реквизита";
-        }
+        $examples = $this->getRandomExamples();
+        $examplesJson = json_encode($examples, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+
+        $requisitesText = !empty($request->requisites)
+            ? implode(', ', $request->requisites)
+            : 'не указан';
+
+        $activityLevelText = match($request->activityLevel) {
+            'low' => 'Низкая (спокойные, интеллектуальные игры, минимум бега)',
+            'medium' => 'Средняя (умеренный бег, эстафеты, подвижные игры)',
+            'high' => 'Высокая (интенсивный бег, прыжки, высокая физическая нагрузка)',
+            default => 'Средняя'
+        };
 
         return <<<PROMPT
-Создай игру для детей {$request->minAge}-{$request->maxAge} лет.
-Игроков: {$request->minPlayers}-{$request->maxPlayers}
-Длительность: {$request->duration} минут
-Локация: {$request->locationType}
-{$propsText}
+ПАРАМЕТРЫ:
+- Возраст детей: {$request->age} лет
+- Количество игроков: {$request->players} человек
+- Длительность: {$request->duration} минут
+- Локация: {$request->locationType}
+- Размер площадки: {$request->fieldWidth} x {$request->fieldLength} метров
+- Уровень активности: {$activityLevelText}
+- Доступный реквизит: {$requisitesText}
 
-Проанализируй фото местности и создай игру из 3-5 этапов.
+ПРИМЕРЫ ХОРОШИХ ИГР (строго соблюдай структуру):
+{$examplesJson}
 
-Формат ответа JSON:
+ПРАВИЛА:
+1. Сумма длительности всех этапов = {$request->duration} минут
+2. Количество этапов: от 1 до 3 (если игра до 15 минут — 1 этап)
+3. Каждый этап должен отличаться по механике
+4. Сюжет должен быть единым для всей игры
+5. Описания должны быть понятны любому ведущему, четко описана суть каждого этапа
+6. Игра должна быть физически выполнима для возрастной группы. Учитывай указанный уровень активности
+7. Учитывай размер площадки — не предлагай задания, требующие больше места, чем есть
+8. Для {$request->players} игроков предложи конкретное распределение по ролям или командам
+9. Названия игры и этапов должны быть четкими и понятными
+10. Используй для игры только ту зону, которая указана на фотографии
+11. Делай правильное склонение слов в тексте
+
+ФОРМАТ ОТВЕТА (ТОЛЬКО JSON, БЕЗ ПОЯСНЕНИЙ):
 {
-    "title": "Название игры",
-    "description": "Описание",
+    "title": "название игры",
+    "description": "описание сюжета и хода игры (4-6 предложений)",
     "stages": [
         {
-            "title": "Название этапа",
-            "description": "Описание",
-            "duration": 10,
-            "tasks": ["задача 1", "задача 2"],
-            "props": ["реквизит 1", "реквизит 2"]
+            "title": "название этапа",
+            "description": "подробное описание: что делают дети, что делает ведущий, как определить результат (6-10 предложений)",
+            "duration": "число, минут",
+            "tasks": ["конкретное действие игрока 1", "действие 2", "действие 3"],
+            "props": ["какой реквизит нужен"],
+            "stage_goal": "что получают дети после этапа"
         }
     ]
 }
+
+ВЕРНИ ТОЛЬКО JSON. НИКАКОГО ДРУГОГО ТЕКСТА.
 PROMPT;
+    }
+
+    private function getRandomExamples(): array
+    {
+        $path = __DIR__ . '/../train/base.json';
+
+        if (!file_exists($path)) {
+            return [];
+        }
+
+        $content = file_get_contents($path);
+        $games = json_decode($content, true);
+
+        if (!is_array($games) || empty($games)) {
+            return [];
+        }
+
+        shuffle($games);
+        return array_slice($games, 0, 7);
     }
 
     private function saveGame(array $aiData, User $author, GenerateGameRequest $request, array $savedPhotos): Game
@@ -156,12 +219,13 @@ PROMPT;
         $game->setTitle($aiData['title'] ?? 'Без названия');
         $game->setDescription($aiData['description'] ?? '');
         $game->setAuthor($author);
-        $game->setMinAge($request->minAge);
-        $game->setMaxAge($request->maxAge);
-        $game->setMinPlayers($request->minPlayers);
-        $game->setMaxPlayers($request->maxPlayers);
+        $game->setAge($request->age);
+        $game->setPlayers($request->players);
         $game->setDuration($request->duration);
         $game->setLocationType(GameLocationType::from($request->locationType));
+        $game->setFieldWidth($request->fieldWidth);
+        $game->setFieldLength($request->fieldLength);
+        $game->setActivityLevel(ActivityLevel::from($request->activityLevel));
         $game->setRequisites($request->requisites);
         $game->setIsPublic(false);
         $game->setPhotos($savedPhotos);
