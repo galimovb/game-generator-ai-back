@@ -7,7 +7,7 @@ use App\Game\Entity\Game;
 use App\Game\Repository\GameLikeRepository;
 use App\Game\Repository\GameRepository;
 use App\Security\Voter\GameVoter;
-use App\Shared\Enum\ActivityLevel;
+use App\Shared\Enum\GameActivityLevel;
 use App\Shared\Enum\ErrorCode;
 use App\Shared\Enum\GameLocationType;
 use App\Shared\Exception\ApiException;
@@ -121,7 +121,7 @@ class GameService
             $game->setFieldLength($request->fieldLength);
         }
         if ($request->activityLevel !== null) {
-            $game->setActivityLevel(ActivityLevel::from($request->activityLevel));
+            $game->setActivityLevel(GameActivityLevel::from($request->activityLevel));
         }
         if ($request->requisites !== null) {
             $game->setRequisites($request->requisites);

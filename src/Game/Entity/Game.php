@@ -3,6 +3,7 @@
 namespace App\Game\Entity;
 
 use App\Game\Repository\GameRepository;
+use App\Shared\Enum\GameActivityLevel;
 use App\Shared\Enum\GameLocationType;
 use App\Shared\Trait\AuthorableTrait;
 use App\Shared\Trait\TimestampableTrait;
@@ -47,8 +48,8 @@ class Game
     #[ORM\Column(nullable: true)]
     private ?int $fieldLength = null;
 
-    #[ORM\Column(length: 20, nullable: true)]
-    private ?string $activityLevel = null;
+    #[ORM\Column(length: 20, nullable: true, enumType: GameActivityLevel::class)]
+    private ?GameActivityLevel $activityLevel = null;
 
     #[ORM\Column(type: Types::JSON, nullable: true)]
     private ?array $photos = null;
@@ -58,6 +59,9 @@ class Game
 
     #[ORM\Column]
     private bool $isPublic = false;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $locationDescription = null;
 
     #[ORM\OneToMany(mappedBy: 'game', targetEntity: GameStage::class, cascade: ['persist', 'remove'])]
     private Collection $stages;
@@ -168,12 +172,12 @@ class Game
         return $this;
     }
 
-    public function getActivityLevel(): ?string
+    public function getActivityLevel(): ?GameActivityLevel
     {
         return $this->activityLevel;
     }
 
-    public function setActivityLevel(?string $activityLevel): static
+    public function setActivityLevel(?GameActivityLevel $activityLevel): static
     {
         $this->activityLevel = $activityLevel;
         return $this;
@@ -210,6 +214,16 @@ class Game
     {
         $this->isPublic = $isPublic;
         return $this;
+    }
+
+    public function getLocationDescription(): ?string
+    {
+        return $this->locationDescription;
+    }
+
+    public function setLocationDescription(?string $locationDescription): void
+    {
+        $this->locationDescription = $locationDescription;
     }
 
     public function getStages(): Collection

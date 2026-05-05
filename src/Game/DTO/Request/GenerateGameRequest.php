@@ -50,5 +50,9 @@ readonly class GenerateGameRequest
             new Assert\Regex('/^data:image\/(jpeg|png|webp|gif);base64,/')
         ])]
         public array $photos = [],
+
+        #[Assert\Length(min: 10)]
+        public ?string $locationDescription = null,
+
     ) {}
 }

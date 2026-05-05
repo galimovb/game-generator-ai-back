@@ -5,8 +5,8 @@ namespace App\Game\Service;
 use App\Game\DTO\Request\GenerateGameRequest;
 use App\Game\Entity\Game;
 use App\Game\Entity\GameStage;
-use App\Shared\Enum\ActivityLevel;
 use App\Shared\Enum\ErrorCode;
+use App\Shared\Enum\GameActivityLevel;
 use App\Shared\Enum\GameLocationType;
 use App\Shared\Enum\UploadType;
 use App\Shared\Exception\ApiException;
@@ -30,11 +30,12 @@ class GameGenerationService
     public function generateAndSave(GenerateGameRequest $request, User $author): Game
     {
         $settings = $author->getUserSettings();
-        $model = $settings->getGenerationModel()->value;
+        //$model = $settings->getGenerationModel()->value;
+        $model = 'qwen/qwen3.6-plus';
         $creative = $settings->getGenerationCreative();
 
         $savedPhotos = $this->saveRequestPhotos($request, $author->getId());
-        $aiData = $this->callVLM($request, $savedPhotos, $model, $creative);
+        $aiData = $this->callVLM($request, $request->photos, $model, $creative);
 
         return $this->saveGame($aiData, $author, $request, $savedPhotos);
     }
@@ -55,22 +56,17 @@ class GameGenerationService
         return $savedPaths;
     }
 
-    private function callVLM(GenerateGameRequest $request, array $requestPhotos, string $model, float $creative): array
+    private function callVLM(GenerateGameRequest $request, array $requestPhotos, string $model, float $creative, int $retryCount = 2): array
     {
         $prompt = $this->buildPrompt($request);
         $userContent = [
-            [
-                'type' => 'text',
-                'text' => $prompt
-            ]
+            ['type' => 'text', 'text' => $prompt]
         ];
 
-        foreach ($requestPhotos as $photo) {
+        foreach ($requestPhotos as $photoBase64) {
             $userContent[] = [
                 'type' => 'image_url',
-                'image_url' => [
-                    'url' => $photo
-                ]
+                'image_url' => ['url' => $photoBase64]
             ];
         }
 
@@ -87,49 +83,67 @@ class GameGenerationService
             'photos_count' => count($requestPhotos),
         ]);
 
-        $response = $this->httpClient->request('POST', $this->aiApiUrl . '/chat/completions', [
-            'headers' => [
-                'Authorization' => 'Bearer ' . $this->aiApiKey,
-                'Content-Type' => 'application/json',
-            ],
-            'json' => [
-                'model' => $model,
-                'messages' => [
-                    [
-                        'role' => 'system',
-                        'content' => 'Ты преподаватель детей, вожатый в лагере, воспитатель в детском саду с опытом более 10 лет. Проанализируй фото местности и на основе особенностей местности делай все. Отвечай только в JSON.'
+        for ($attempt = 1; $attempt <= $retryCount; $attempt++) {
+            try {
+                $response = $this->httpClient->request('POST', $this->aiApiUrl . '/chat/completions', [
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->aiApiKey,
+                        'Content-Type' => 'application/json',
                     ],
-                    [
-                        'role' => 'user',
-                        'content' => $userContent
-                    ]
-                ],
-                'temperature' => $creative,
-                'max_tokens' => 4000,
-                'response_format' => ['type' => 'json_object'],
-            ],
-            'timeout' => 120,
-        ]);
+                    'json' => [
+                        'model' => $model,
+                        'messages' => [
+                            [
+                                'role' => 'system',
+                                'content' => 'Ты преподаватель детей, вожатый в лагере, воспитатель в детском саду с опытом более 10 лет. Проанализируй фото местности и на основе особенностей местности делай все. Отвечай только в JSON.'
+                            ],
+                            [
+                                'role' => 'user',
+                                'content' => $userContent
+                            ]
+                        ],
+                        'temperature' => $creative,
+                        'max_tokens' => 12000,
+                        'response_format' => ['type' => 'json_object'],
+                    ],
+                    'timeout' => 120,
+                ]);
 
-        $data = $response->toArray();
-        $content = $data['choices'][0]['message']['content'] ?? '{}';
+                $data = $response->toArray();
+                $content = $data['choices'][0]['message']['content'] ?? '{}';
 
-        $this->logger->info('AI Response', [
-            'content_length' => strlen($content),
-            'content_preview' => substr($content, 0, 500)
-        ]);
+                $this->logger->info('AI Response', [
+                    'attempt' => $attempt,
+                    'content_length' => strlen($content),
+                    'content_preview' => substr($content, 0, 500)
+                ]);
 
-        $result = json_decode($content, true);
+                $result = json_decode($content, true);
 
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            $this->logger->error('Invalid JSON from AI', [
-                'error' => json_last_error_msg(),
-                'content' => substr($content, 0, 1000)
-            ]);
-            throw new ApiException(ErrorCode::GENERATION_FAILED);
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    $this->logger->warning('Invalid JSON from AI, attempt ' . $attempt);
+                    continue;
+                }
+
+                $this->validateAiResponse($result);
+                return $result;
+
+            } catch (ApiException $e) {
+                $this->logger->warning('AI response validation failed, attempt ' . $attempt);
+                if ($attempt === $retryCount) {
+                    throw $e;
+                }
+            } catch (\Exception $e) {
+                $this->logger->error('AI request failed, attempt ' . $attempt, [
+                    'error' => $e->getMessage(),
+                ]);
+                if ($attempt === $retryCount) {
+                    throw new ApiException(ErrorCode::GENERATION_FAILED);
+                }
+            }
         }
 
-        return $result;
+        throw new ApiException(ErrorCode::GENERATION_FAILED);
     }
 
     private function buildPrompt(GenerateGameRequest $request): string
@@ -213,6 +227,42 @@ PROMPT;
         return array_slice($games, 0, 7);
     }
 
+    private function validateAiResponse(array $aiData): void
+    {
+        if (empty($aiData)) {
+            throw new ApiException(ErrorCode::GENERATION_FAILED);
+        }
+
+        if (empty($aiData['title']) || !is_string($aiData['title'])) {
+            throw new ApiException(ErrorCode::GENERATION_FAILED);
+        }
+
+        if (empty($aiData['stages']) || !is_array($aiData['stages']) || count($aiData['stages']) === 0) {
+            throw new ApiException(ErrorCode::GENERATION_FAILED);
+        }
+
+        $totalDuration = 0;
+        foreach ($aiData['stages'] as $index => $stage) {
+            if (empty($stage['title']) || !is_string($stage['title'])) {
+                throw new ApiException(ErrorCode::GENERATION_FAILED);
+            }
+
+            if (empty($stage['description']) || !is_string($stage['description'])) {
+                throw new ApiException(ErrorCode::GENERATION_FAILED);
+            }
+
+            if (empty($stage['duration']) || !is_numeric($stage['duration']) || $stage['duration'] <= 0) {
+                throw new ApiException(ErrorCode::GENERATION_FAILED);
+            }
+
+            $totalDuration += (int) $stage['duration'];
+        }
+
+        if ($totalDuration === 0) {
+            throw new ApiException(ErrorCode::GENERATION_FAILED);
+        }
+    }
+
     private function saveGame(array $aiData, User $author, GenerateGameRequest $request, array $savedPhotos): Game
     {
         $game = new Game();
@@ -225,7 +275,7 @@ PROMPT;
         $game->setLocationType(GameLocationType::from($request->locationType));
         $game->setFieldWidth($request->fieldWidth);
         $game->setFieldLength($request->fieldLength);
-        $game->setActivityLevel(ActivityLevel::from($request->activityLevel));
+        $game->setActivityLevel(GameActivityLevel::from($request->activityLevel));
         $game->setRequisites($request->requisites);
         $game->setIsPublic(false);
         $game->setPhotos($savedPhotos);
