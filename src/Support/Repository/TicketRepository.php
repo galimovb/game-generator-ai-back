@@ -40,4 +40,44 @@ class TicketRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+
+    public function findWithSearch(array $criteria, ?string $search, int $limit, int $offset): array
+    {
+        if ($search !== null) {
+            $search = '%' . trim(preg_replace('/\s+/', ' ', $search)) . '%';
+        }
+
+        $qb = $this->createQueryBuilder('t');
+
+        foreach ($criteria as $field => $value) {
+            $qb->andWhere("t.$field = :$field")->setParameter($field, $value);
+        }
+
+        if ($search) {
+            $qb->andWhere('t.subject LIKE :search OR t.description LIKE :search')
+                ->setParameter('search', "%$search%");
+        }
+
+        $items = $qb->orderBy('t.createdAt', 'DESC')
+            ->setFirstResult($offset)
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+
+        $countQb = $this->createQueryBuilder('t')
+            ->select('COUNT(t.id)');
+
+        foreach ($criteria as $field => $value) {
+            $countQb->andWhere("t.$field = :$field")->setParameter($field, $value);
+        }
+
+        if ($search) {
+            $countQb->andWhere('t.subject LIKE :search OR t.description LIKE :search')
+                ->setParameter('search', "%$search%");
+        }
+
+        $total = (int) $countQb->getQuery()->getSingleScalarResult();
+
+        return ['items' => $items, 'total' => $total];
+    }
 }

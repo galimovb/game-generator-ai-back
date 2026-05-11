@@ -129,6 +129,9 @@ class GameService
         if ($request->isPublic !== null) {
             $game->setIsPublic($request->isPublic);
         }
+        if ($request->locationDescription !== null) {
+            $game->setLocationDescription($request->locationDescription);
+        }
 
         $this->entityManager->flush();
         $this->entityManager->refresh($game);

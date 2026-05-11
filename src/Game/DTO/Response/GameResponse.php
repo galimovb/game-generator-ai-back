@@ -30,6 +30,7 @@ readonly class GameResponse
         public ?bool $isLiked,
         public string $createdAt,
         public ?string $updatedAt,
+        public ?string $locationDescription = null,
     ) {}
 
     public static function fromEntity(
@@ -60,6 +61,7 @@ readonly class GameResponse
             isLiked: $isLiked,
             createdAt: $game->getCreatedAt()->format('c'),
             updatedAt: $game->getUpdatedAt()?->format('c'),
+            locationDescription: $game->getLocationDescription(),
         );
     }
 }

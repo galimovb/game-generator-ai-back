@@ -15,7 +15,7 @@ class UserSettings
     private ?int $id = null;
 
     #[ORM\Column(enumType: ModelType::class)]
-    private ModelType $generationModel = ModelType::QWEN3_VL_8B;
+    private ModelType $generationModel = ModelType::QWEN3_6_PLUS;
 
     #[ORM\Column]
     private float $generationCreative = 0.7;

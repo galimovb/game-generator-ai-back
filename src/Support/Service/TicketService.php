@@ -5,6 +5,7 @@ namespace App\Support\Service;
 use App\Shared\Enum\ErrorCode;
 use App\Shared\Enum\TicketPriority;
 use App\Shared\Enum\TicketStatus;
+use App\Shared\Enum\TicketSystemMessage;
 use App\Shared\Exception\ApiException;
 use App\Support\DTO\Request\ChangeTicketPriorityRequest;
 use App\Support\DTO\Request\ChangeTicketStatusRequest;
@@ -38,33 +39,19 @@ class TicketService
         return $ticket;
     }
 
-    public function getTicketList(User $user, int $page, int $limit, ?string $status = null): array
+    public function getTicketList(User $user, int $page, int $limit, ?string $status = null, ?string $search = null): array
     {
         $offset = ($page - 1) * $limit;
 
         $criteria = [];
-
         if (!$this->accessService->isSupport($user)) {
             $criteria['author'] = $user;
         }
-
-        if ($status !== null) {
+        if ($status) {
             $criteria['status'] = TicketStatus::tryFrom($status);
         }
 
-        $items = $this->repo->findBy(
-            $criteria,
-            ['createdAt' => 'DESC'],
-            $limit,
-            $offset
-        );
-
-        $total = $this->repo->count($criteria);
-
-        return [
-            'items' => $items,
-            'total' => $total
-        ];
+        return $this->repo->findWithSearch($criteria, $search, $limit, $offset);
     }
 
     public function getTicket(int $id, User $user): Ticket
@@ -92,10 +79,7 @@ class TicketService
         $ticket->setAssignedTo($user);
         $ticket->setStatus(TicketStatus::IN_PROGRESS);
 
-        $this->messageService->createSystemMessage($ticket, [
-            'event' => 'assigned',
-            'userId' => $user->getId()
-        ]);
+        $this->messageService->createSystemMessageFromEnum($ticket, TicketSystemMessage::TAKEN);
 
         $this->em->flush();
 
@@ -117,10 +101,9 @@ class TicketService
 
         $ticket->setStatus($new);
 
-        $this->messageService->createSystemMessage($ticket, [
-            'event' => 'status_changed',
-            'from' => $old->value,
-            'to' => $new->value
+        $this->messageService->createSystemMessageFromEnum($ticket, TicketSystemMessage::STATUS_CHANGED, [
+            'old' => $old->value,
+            'new' => $new->value
         ]);
 
         $this->em->flush();
@@ -138,12 +121,6 @@ class TicketService
         $new = TicketPriority::from($dto->priority);
 
         $ticket->setPriority($new);
-
-        $this->messageService->createSystemMessage($ticket, [
-            'event' => 'priority_changed',
-            'from' => $old->value,
-            'to' => $new->value
-        ]);
 
         $this->em->flush();
 
@@ -166,10 +143,7 @@ class TicketService
         $ticket->setStatus(TicketStatus::CLOSED);
         $ticket->setClosedAt(new \DateTimeImmutable());
 
-        $this->messageService->createSystemMessage($ticket, [
-            'event' => 'closed',
-            'closedBy' => $user->getId()
-        ]);
+        $this->messageService->createSystemMessageFromEnum($ticket, TicketSystemMessage::CLOSED);
 
         $this->em->flush();
 

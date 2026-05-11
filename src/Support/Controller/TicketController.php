@@ -44,8 +44,9 @@ class TicketController extends AbstractController
         $page = $request->query->getInt('page', 1);
         $limit = $request->query->getInt('limit', 20);
         $status = $request->query->get('status');
+        $search = $request->query->get('search');
 
-        $result = $this->ticketService->getTicketList($user, $page, $limit, $status);
+        $result = $this->ticketService->getTicketList($user, $page, $limit, $status, $search);
 
         return ApiResponse::success([
             'items' => array_map(

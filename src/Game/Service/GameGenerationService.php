@@ -8,6 +8,7 @@ use App\Game\Entity\GameStage;
 use App\Shared\Enum\ErrorCode;
 use App\Shared\Enum\GameActivityLevel;
 use App\Shared\Enum\GameLocationType;
+use App\Shared\Enum\ModelType;
 use App\Shared\Enum\UploadType;
 use App\Shared\Exception\ApiException;
 use App\Shared\Service\UploadService;
@@ -23,6 +24,7 @@ class GameGenerationService
         private readonly EntityManagerInterface $entityManager,
         private readonly string $aiApiKey,
         private readonly string $aiApiUrl,
+        private readonly string $ollamaApiUrl,
         private readonly UploadService $uploadService,
         private readonly LoggerInterface $logger,
     ) {}
@@ -30,12 +32,11 @@ class GameGenerationService
     public function generateAndSave(GenerateGameRequest $request, User $author): Game
     {
         $settings = $author->getUserSettings();
-        //$model = $settings->getGenerationModel()->value;
-        $model = 'qwen/qwen3.6-plus';
+        $model = $settings->getGenerationModel()->value;
         $creative = $settings->getGenerationCreative();
 
         $savedPhotos = $this->saveRequestPhotos($request, $author->getId());
-        $aiData = $this->callVLM($request, $request->photos, $model, $creative);
+        $aiData = $this->callAI($request, $request->photos, $model, $creative);
 
         return $this->saveGame($aiData, $author, $request, $savedPhotos);
     }
@@ -56,7 +57,7 @@ class GameGenerationService
         return $savedPaths;
     }
 
-    private function callVLM(GenerateGameRequest $request, array $requestPhotos, string $model, float $creative, int $retryCount = 2): array
+    private function callAI(GenerateGameRequest $request, array $requestPhotos, string $model, float $creative, int $retryCount = 2): array
     {
         $prompt = $this->buildPrompt($request);
         $userContent = [
@@ -81,53 +82,33 @@ class GameGenerationService
             'model' => $model,
             'creative' => $creative,
             'photos_count' => count($requestPhotos),
+            'has_location_description' => !empty($request->locationDescription),
         ]);
+
+        $messages = [
+            [
+                'role' => 'system',
+                'content' => $this->buildSystemPrompt($request)
+            ],
+            [
+                'role' => 'user',
+                'content' => $userContent
+            ]
+        ];
+
+        $payload = [
+            'model' => $model,
+            'messages' => $messages,
+            'temperature' => $creative,
+            'max_tokens' => 12000,
+            'response_format' => ['type' => 'json_object'],
+        ];
 
         for ($attempt = 1; $attempt <= $retryCount; $attempt++) {
             try {
-                $response = $this->httpClient->request('POST', $this->aiApiUrl . '/chat/completions', [
-                    'headers' => [
-                        'Authorization' => 'Bearer ' . $this->aiApiKey,
-                        'Content-Type' => 'application/json',
-                    ],
-                    'json' => [
-                        'model' => $model,
-                        'messages' => [
-                            [
-                                'role' => 'system',
-                                'content' => 'Ты преподаватель детей, вожатый в лагере, воспитатель в детском саду с опытом более 10 лет. Проанализируй фото местности и на основе особенностей местности делай все. Отвечай только в JSON.'
-                            ],
-                            [
-                                'role' => 'user',
-                                'content' => $userContent
-                            ]
-                        ],
-                        'temperature' => $creative,
-                        'max_tokens' => 12000,
-                        'response_format' => ['type' => 'json_object'],
-                    ],
-                    'timeout' => 120,
-                ]);
-
-                $data = $response->toArray();
-                $content = $data['choices'][0]['message']['content'] ?? '{}';
-
-                $this->logger->info('AI Response', [
-                    'attempt' => $attempt,
-                    'content_length' => strlen($content),
-                    'content_preview' => substr($content, 0, 500)
-                ]);
-
-                $result = json_decode($content, true);
-
-                if (json_last_error() !== JSON_ERROR_NONE) {
-                    $this->logger->warning('Invalid JSON from AI, attempt ' . $attempt);
-                    continue;
-                }
-
+                $result = $this->sendCloudRequest($payload, $attempt);
                 $this->validateAiResponse($result);
                 return $result;
-
             } catch (ApiException $e) {
                 $this->logger->warning('AI response validation failed, attempt ' . $attempt);
                 if ($attempt === $retryCount) {
@@ -138,12 +119,118 @@ class GameGenerationService
                     'error' => $e->getMessage(),
                 ]);
                 if ($attempt === $retryCount) {
-                    throw new ApiException(ErrorCode::GENERATION_FAILED);
+                    $this->logger->info('Switching to Ollama fallback');
+                    try {
+                        $result = $this->sendOllamaRequest($payload);
+                        $this->validateAiResponse($result);
+                        return $result;
+                    } catch (\Exception $ollamaEx) {
+                        $this->logger->error('Ollama fallback failed', [
+                            'error' => $ollamaEx->getMessage(),
+                        ]);
+                        throw new ApiException(ErrorCode::GENERATION_FAILED);
+                    }
                 }
             }
         }
 
         throw new ApiException(ErrorCode::GENERATION_FAILED);
+    }
+
+    private function sendCloudRequest(array $payload, int $attempt): array
+    {
+        $response = $this->httpClient->request('POST', $this->aiApiUrl . '/chat/completions', [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $this->aiApiKey,
+                'Content-Type' => 'application/json',
+            ],
+            'json' => $payload,
+            'timeout' => 120,
+        ]);
+
+        $statusCode = $response->getStatusCode();
+
+        if ($statusCode >= 500) {
+            $this->logger->error('Cloud AI returned server error', [
+                'attempt' => $attempt,
+                'status_code' => $statusCode,
+            ]);
+            throw new \RuntimeException('Cloud AI server error: HTTP ' . $statusCode);
+        }
+
+        $data = $response->toArray();
+        $content = $data['choices'][0]['message']['content'] ?? '{}';
+
+        $this->logger->info('Cloud AI Response', [
+            'attempt' => $attempt,
+            'content_length' => strlen($content),
+            'content_preview' => substr($content, 0, 500)
+        ]);
+
+        $result = json_decode($content, true);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            $this->logger->warning('Invalid JSON from cloud AI, attempt ' . $attempt);
+            throw new ApiException(ErrorCode::GENERATION_FAILED);
+        }
+
+        return $result;
+    }
+
+    private function sendOllamaRequest(array $payload): array
+    {
+        $fallbackModel = ModelType::fallbackModel();
+        $payload['model'] = $fallbackModel;
+
+        $this->logger->info('Sending request to Ollama', [
+            'model' => $fallbackModel,
+        ]);
+
+        $response = $this->httpClient->request('POST', $this->ollamaApiUrl . '/api/chat/completions', [
+            'headers' => [
+                'Content-Type' => 'application/json',
+            ],
+            'json' => $payload,
+            'timeout' => 180,
+        ]);
+
+        $statusCode = $response->getStatusCode();
+
+        if ($statusCode >= 400) {
+            throw new \RuntimeException('Ollama returned error: HTTP ' . $statusCode);
+        }
+
+        $data = $response->toArray();
+        $content = $data['choices'][0]['message']['content'] ?? '{}';
+
+        $this->logger->info('Ollama Response', [
+            'content_length' => strlen($content),
+            'content_preview' => substr($content, 0, 500)
+        ]);
+
+        $result = json_decode($content, true);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new ApiException(ErrorCode::GENERATION_FAILED);
+        }
+
+        return $result;
+    }
+
+    private function buildSystemPrompt(GenerateGameRequest $request): string
+    {
+        $hasPhotos = !empty($request->photos);
+        $hasDescription = !empty($request->locationDescription);
+
+        if ($hasPhotos) {
+            return 'Ты преподаватель детей, вожатый в лагере, воспитатель в детском саду с опытом более 10 лет. Проанализируй фото местности и на основе особенностей местности делай все. Отвечай только в JSON.';
+        }
+
+        if ($hasDescription) {
+            return 'Ты преподаватель детей, вожатый в лагере, воспитатель в детском саду с опытом более 10 лет. Проанализируй описание местности и на основе особенностей местности создавай игры. Отвечай только в JSON.';
+        }
+
+        return 'Ты преподаватель детей, вожатый в лагере, воспитатель в детском саду с опытом более 10 лет. Создавай игры на основе параметров. Отвечай только в JSON.';
     }
 
     private function buildPrompt(GenerateGameRequest $request): string
@@ -162,6 +249,11 @@ class GameGenerationService
             default => 'Средняя'
         };
 
+        $locationBlock = '';
+        if (!empty($request->locationDescription)) {
+            $locationBlock = "\n\nОПИСАНИЕ МЕСТНОСТИ:\n{$request->locationDescription}\n\nОпирайся на это описание местности при создании игры. Учитывай особенности рельефа, покрытия, доступное пространство и объекты на площадке.";
+        }
+
         return <<<PROMPT
 ПАРАМЕТРЫ:
 - Возраст детей: {$request->age} лет
@@ -171,7 +263,7 @@ class GameGenerationService
 - Размер площадки: {$request->fieldWidth} x {$request->fieldLength} метров
 - Уровень активности: {$activityLevelText}
 - Доступный реквизит: {$requisitesText}
-
+{$locationBlock}
 ПРИМЕРЫ ХОРОШИХ ИГР (строго соблюдай структуру):
 {$examplesJson}
 
@@ -185,7 +277,7 @@ class GameGenerationService
 7. Учитывай размер площадки — не предлагай задания, требующие больше места, чем есть
 8. Для {$request->players} игроков предложи конкретное распределение по ролям или командам
 9. Названия игры и этапов должны быть четкими и понятными
-10. Используй для игры только ту зону, которая указана на фотографии
+10. Используй для игры только ту зону, которая описана или указана на фотографии
 11. Делай правильное склонение слов в тексте
 
 ФОРМАТ ОТВЕТА (ТОЛЬКО JSON, БЕЗ ПОЯСНЕНИЙ):
@@ -279,6 +371,7 @@ PROMPT;
         $game->setRequisites($request->requisites);
         $game->setIsPublic(false);
         $game->setPhotos($savedPhotos);
+        $game->setLocationDescription($request->locationDescription);
 
         $this->entityManager->persist($game);
         $this->entityManager->flush();

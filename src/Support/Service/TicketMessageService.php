@@ -5,6 +5,7 @@ namespace App\Support\Service;
 use App\Shared\Enum\ErrorCode;
 use App\Shared\Enum\TicketMessageType;
 use App\Shared\Enum\TicketStatus;
+use App\Shared\Enum\TicketSystemMessage;
 use App\Shared\Enum\UploadType;
 use App\Shared\Exception\ApiException;
 use App\Shared\Service\UploadService;
@@ -136,18 +137,19 @@ class TicketMessageService
         $this->em->flush();
     }
 
-    public function createSystemMessage(Ticket $ticket, array $payload): void
+    public function createSystemMessageFromEnum(Ticket $ticket, TicketSystemMessage $event, array $context = []): void
     {
+        $text = $event->getText($context);
+
         $message = new TicketMessage();
         $message->setTicket($ticket);
         $message->setAuthor(null);
         $message->setMessageType(TicketMessageType::SYSTEM);
-        $message->setText(json_encode($payload, JSON_UNESCAPED_UNICODE));
+        $message->setText($text);
 
         $this->em->persist($message);
     }
 
-    // ==================== PRIVATE МЕТОДЫ ====================
 
     private function findMessageOrFail(int $id): TicketMessage
     {

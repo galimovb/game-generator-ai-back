@@ -2,6 +2,7 @@
 
 namespace App\Game\Controller;
 
+use App\Game\DTO\Request\GameListFilters;
 use App\Game\DTO\Request\GenerateGameRequest;
 use App\Game\DTO\Request\UpdateGameRequest;
 use App\Game\DTO\Response\GameResponse;
@@ -34,24 +35,23 @@ class GameController extends AbstractController
     }
 
     #[Route('', name: 'public', methods: ['GET'])]
-    public function listPublic(Request $request, #[CurrentUser] User $user): JsonResponse
-    {
-            $page = $request->query->getInt('page', 1);
-            $limit = $request->query->getInt('limit', 20);
+    public function listPublic(
+        #[MapRequestPayload(resolver: 'query')] GameListFilters $filters,
+        #[CurrentUser] User $user
+    ): JsonResponse {
+        $result = $this->gameService->getPublicGames($filters, $user);
 
-            $result = $this->gameService->getPublicGames($page, $limit, $user);
-
-            return ApiResponse::success([
-                'items' => array_map(
-                    fn($item) => GameResponse::fromEntity($item['game'], $item['isLiked']),
-                    $result['items']
-                ),
-                'pagination' => [
-                    'page' => $page,
-                    'limit' => $limit,
-                    'total' => $result['total']
-                ]
-            ]);
+        return ApiResponse::success([
+            'items' => array_map(
+                fn($item) => GameResponse::fromEntity($item['game'], $item['isLiked']),
+                $result['items']
+            ),
+            'pagination' => [
+                'page' => $filters->page,
+                'limit' => $filters->limit,
+                'total' => $result['total']
+            ]
+        ]);
     }
 
     #[Route('/liked', name: 'liked', methods: ['GET'])]
