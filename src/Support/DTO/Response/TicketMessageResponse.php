@@ -12,7 +12,7 @@ readonly class TicketMessageResponse
         public ?string       $text,
         public ?array        $photos,
         public string        $messageType,
-        public ?UserResponse $owner,
+        public ?UserResponse $author,
         public string        $createdAt,
         public ?string       $updatedAt,
     ) {}
@@ -24,7 +24,9 @@ readonly class TicketMessageResponse
             text: $message->getText(),
             photos: $message->getPhotos(),
             messageType: $message->getMessageType()->value,
-            owner: UserResponse::fromEntity($message->getAuthor()),
+            author: $message->getAuthor()
+                ? UserResponse::fromEntity($message->getAuthor())
+                : null,
             createdAt: $message->getCreatedAt()->format('c'),
             updatedAt: $message->getUpdatedAt()?->format('c'),
         );

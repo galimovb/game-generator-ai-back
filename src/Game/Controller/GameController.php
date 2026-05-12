@@ -13,6 +13,7 @@ use App\User\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
@@ -36,7 +37,7 @@ class GameController extends AbstractController
 
     #[Route('', name: 'public', methods: ['GET'])]
     public function listPublic(
-        #[MapRequestPayload(resolver: 'query')] GameListFilters $filters,
+        #[MapQueryString] GameListFilters $filters,
         #[CurrentUser] User $user
     ): JsonResponse {
         $result = $this->gameService->getPublicGames($filters, $user);

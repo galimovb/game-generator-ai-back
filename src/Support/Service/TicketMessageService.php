@@ -55,7 +55,7 @@ class TicketMessageService
     {
         $ticket = $this->accessService->findTicketOrFail($ticketId);
 
-        $isSupport = $this->accessService->isSupport($user);
+        $isSupport = $this->accessService->isSupportOrAdmin($user);
 
         if (!$isSupport && $ticket->getAuthor()->getId() !== $user->getId()) {
             throw new ApiException(ErrorCode::FORBIDDEN);

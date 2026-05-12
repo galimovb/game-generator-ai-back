@@ -6,6 +6,7 @@ use App\Shared\Enum\TicketMessageType;
 use App\Shared\Trait\AuthorableTrait;
 use App\Shared\Trait\TimestampableTrait;
 use App\Support\Repository\TicketMessageRepository;
+use App\User\Entity\User;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -14,7 +15,6 @@ use Doctrine\ORM\Mapping as ORM;
 class TicketMessage
 {
     use TimestampableTrait;
-    use AuthorableTrait;
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -32,6 +32,20 @@ class TicketMessage
 
     #[ORM\Column(enumType: TicketMessageType::class)]
     private ?TicketMessageType $messageType = null;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?User $author = null;
+
+    public function getAuthor(): ?User
+    {
+        return $this->author;
+    }
+
+    public function setAuthor(?User $author): void
+    {
+        $this->author = $author;
+    }
 
     public function getId(): ?int
     {

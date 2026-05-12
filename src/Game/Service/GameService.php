@@ -2,6 +2,7 @@
 
 namespace App\Game\Service;
 
+use App\Game\DTO\Request\GameListFilters;
 use App\Game\DTO\Request\UpdateGameRequest;
 use App\Game\Entity\Game;
 use App\Game\Repository\GameLikeRepository;
@@ -24,20 +25,13 @@ class GameService
         private readonly AuthorizationCheckerInterface $authChecker,
     ) {}
 
-    public function getPublicGames(int $page, int $limit, ?User $user = null): array
+    public function getPublicGames(GameListFilters $filters, ?User $user = null): array
     {
-        $items = $this->gameRepository->findBy(
-            ['isPublic' => true],
-            ['createdAt' => 'DESC'],
-            $limit,
-            ($page - 1) * $limit
-        );
-
-        $total = $this->gameRepository->count(['isPublic' => true]);
+        $result = $this->gameRepository->findPublicGamesWithFilters($filters);
 
         return [
-            'items' => $this->attachLikeInfo($items, $user),
-            'total' => $total
+            'items' => $this->attachLikeInfo($result['items'], $user),
+            'total' => $result['total']
         ];
     }
 

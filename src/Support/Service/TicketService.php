@@ -44,7 +44,7 @@ class TicketService
         $offset = ($page - 1) * $limit;
 
         $criteria = [];
-        if (!$this->accessService->isSupport($user)) {
+        if (!$this->accessService->isSupportOrAdmin($user)) {
             $criteria['author'] = $user;
         }
         if ($status) {
@@ -101,10 +101,10 @@ class TicketService
 
         $ticket->setStatus($new);
 
-        $this->messageService->createSystemMessageFromEnum($ticket, TicketSystemMessage::STATUS_CHANGED, [
+        /*$this->messageService->createSystemMessageFromEnum($ticket, TicketSystemMessage::STATUS_CHANGED, [
             'old' => $old->value,
             'new' => $new->value
-        ]);
+        ]);*/
 
         $this->em->flush();
 
@@ -117,7 +117,6 @@ class TicketService
 
         $ticket = $this->accessService->findTicketOrFail($id);
 
-        $old = $ticket->getPriority();
         $new = TicketPriority::from($dto->priority);
 
         $ticket->setPriority($new);
@@ -131,7 +130,7 @@ class TicketService
     {
         $ticket = $this->accessService->findTicketOrFail($id);
 
-        if (!$this->accessService->isSupport($user) &&
+        if (!$this->accessService->isSupportOrAdmin($user) &&
             $ticket->getAuthor()->getId() !== $user->getId()) {
             throw new ApiException(ErrorCode::FORBIDDEN);
         }

@@ -26,33 +26,23 @@ class TicketAccessService
         return $ticket;
     }
 
-    public function isSupport(User $user): bool
+    public function isSupportOrAdmin(User $user): bool
     {
-        return in_array('ROLE_SUPPORT', $user->getRoles());
+        return in_array('ROLE_SUPPORT', $user->getRoles()) || in_array('ROLE_ADMIN', $user->getRoles());
     }
 
     public function canViewTicket(Ticket $ticket, User $user): bool
     {
-        if ($this->isSupport($user)) {
+        if ($this->isSupportOrAdmin($user)) {
             return true;
         }
 
         return $ticket->getAuthor()->getId() === $user->getId();
     }
 
-    public function canModifyTicket(Ticket $ticket, User $user): bool
-    {
-        // Для модификации (написать сообщение, изменить статус и т.д.)
-        if ($ticket->getStatus() === TicketStatus::CLOSED) {
-            return false;
-        }
-
-        return $this->canViewTicket($ticket, $user);
-    }
-
     public function denyIfNotSupport(User $user): void
     {
-        if (!$this->isSupport($user)) {
+        if (!$this->isSupportOrAdmin($user)) {
             throw new ApiException(ErrorCode::FORBIDDEN);
         }
     }
