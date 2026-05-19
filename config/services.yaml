@@ -15,6 +15,7 @@ services:
             $aiApiKey: '%env(ROUTER_AI_API_KEY)%'
             $aiApiUrl: '%env(ROUTER_AI_API_URL)%'
             $ollamaApiUrl: '%env(OLLAMA_API_URL)%'
+            $appEnv: '%env(APP_ENV)%'
 
 
     # makes classes in src/ available to be used as services

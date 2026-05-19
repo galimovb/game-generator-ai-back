@@ -115,4 +115,29 @@ class GameRepository extends ServiceEntityRepository
 
         return (int) $qb->getQuery()->getSingleScalarResult();
     }
+
+    public function findTopLikedGames(int $page, int $limit): array
+    {
+        $items = $this->createQueryBuilder('g')
+            ->select('g', 'COUNT(l.id) AS HIDDEN likesCount')
+            ->leftJoin('g.likes', 'l')
+            ->where('g.isPublic = :isPublic')
+            ->setParameter('isPublic', true)
+            ->groupBy('g.id')
+            ->orderBy('likesCount', 'DESC')
+            ->addOrderBy('g.createdAt', 'DESC')
+            ->setFirstResult(($page - 1) * $limit)
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+
+        $total = (int) $this->createQueryBuilder('g')
+            ->select('COUNT(g.id)')
+            ->where('g.isPublic = :isPublic')
+            ->setParameter('isPublic', true)
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        return ['items' => $items, 'total' => $total];
+    }
 }

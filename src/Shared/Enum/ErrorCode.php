@@ -10,6 +10,7 @@ enum ErrorCode: string
     case LIKE_EXIST = 'LIKE_EXIST';
     case VALIDATION_FAILED = 'VALIDATION_FAILED';
     case GENERATION_FAILED = 'GENERATION_FAILED';
+    case SAFETY_CHECK_FAILED = 'SAFETY_CHECK_FAILED';
     case UNAUTHORIZED = 'UNAUTHORIZED';
     case FORBIDDEN = 'FORBIDDEN';
     case NOT_FOUND = 'NOT_FOUND';
@@ -35,6 +36,7 @@ enum ErrorCode: string
             self::LIKE_EXIST => 'Эта игра уже в избранном',
             self::VALIDATION_FAILED => 'Ошибка валидации данных',
             self::GENERATION_FAILED => 'Ошибка генерации игры',
+            self::SAFETY_CHECK_FAILED => 'Сгенерированная игра не прошла проверку безопасности для данной возрастной группы',
             self::UNAUTHORIZED => 'Требуется авторизация',
             self::FORBIDDEN => 'Доступ запрещен',
             self::NOT_FOUND => 'Ресурс не найден',
@@ -55,10 +57,11 @@ enum ErrorCode: string
     public function getHttpCode(): int
     {
         return match($this) {
-            self::EMAIL_EXIST, self::LOGIN_EXIST, self::VALIDATION_FAILED, self::LIKE_EXIST, self::TICKET_ALREADY_CLOSED => 422,
+            self::EMAIL_EXIST, self::LOGIN_EXIST, self::VALIDATION_FAILED, self::LIKE_EXIST, self::TICKET_ALREADY_CLOSED, self::GENERATION_FAILED, self::SAFETY_CHECK_FAILED => 422,
             self::UNAUTHORIZED, self::INVALID_CREDENTIALS, self::TOKEN_EXPIRED, self::TOKEN_INVALID, self::TOKEN_MISSING   => 401,
             self::FORBIDDEN => 403,
             self::NOT_FOUND, self::COMMENT_NOT_FOUND, self::GAME_NOT_FOUND, self::STAGE_NOT_FOUND, self::USER_NOT_FOUND, self::LIKE_NOT_FOUND => 404,
+            self::INTERNAL_ERROR => 500,
             default => 400,
         };
     }

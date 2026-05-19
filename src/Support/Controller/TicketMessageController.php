@@ -19,7 +19,8 @@ use Symfony\Component\Security\Http\Attribute\CurrentUser;
 class TicketMessageController extends AbstractController
 {
     public function __construct(
-        private readonly TicketMessageService $messageService
+        private readonly TicketMessageService $messageService,
+        private readonly ApiResponse $apiResponse
     ) {}
 
     #[Route('', name: 'list', methods: ['GET'])]
@@ -33,7 +34,7 @@ class TicketMessageController extends AbstractController
 
         $result = $this->messageService->getMessages($ticketId, $user, $page, $limit);
 
-        return ApiResponse::success([
+        return $this->apiResponse->success([
             'items' => array_map(
                 fn($message) => TicketMessageResponse::fromEntity($message),
                 $result['items']
@@ -54,7 +55,7 @@ class TicketMessageController extends AbstractController
     ): JsonResponse {
         $message = $this->messageService->createMessage($ticketId, $request, $user);
 
-        return ApiResponse::success(
+        return $this->apiResponse->success(
             TicketMessageResponse::fromEntity($message),
             201
         );
@@ -68,7 +69,7 @@ class TicketMessageController extends AbstractController
     ): JsonResponse {
         $message = $this->messageService->updateMessage($id, $request, $user);
 
-        return ApiResponse::success(
+        return $this->apiResponse->success(
             TicketMessageResponse::fromEntity($message)
         );
     }
@@ -80,6 +81,6 @@ class TicketMessageController extends AbstractController
     ): JsonResponse {
         $this->messageService->deleteMessage($id, $user);
 
-        return ApiResponse::success(null, 204);
+        return $this->apiResponse->success(null, 204);
     }
 }

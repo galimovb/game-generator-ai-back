@@ -8,7 +8,10 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 class ApiResponse
 {
-    public static function success(mixed $data = null, int $statusCode = 200): JsonResponse
+    public function __construct(
+        private readonly string $appEnv,
+    ) {}
+    public function success(mixed $data = null, int $statusCode = 200): JsonResponse
     {
         return new JsonResponse(
             [
@@ -19,7 +22,7 @@ class ApiResponse
         );
     }
 
-    public static function error(\Throwable $e): JsonResponse
+    public function error(\Throwable $e): JsonResponse
     {
         if ($e instanceof ApiException) {
             return new JsonResponse(
@@ -34,7 +37,8 @@ class ApiResponse
         return new JsonResponse(
             [
                 'error' => ErrorCode::INTERNAL_ERROR->value,
-                'errorMessage' => $e->getMessage()
+                'errorMessage' => ErrorCode::INTERNAL_ERROR->getMessage(),
+                'errorDetails' => $this->appEnv === 'dev' ? $e->getMessage() : null,
             ],
             ErrorCode::INTERNAL_ERROR->getHttpCode()
         );

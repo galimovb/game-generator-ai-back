@@ -74,6 +74,16 @@ class GameService
         ];
     }
 
+    public function getTopLikedGames(int $page, int $limit, ?User $user = null): array
+    {
+        $result = $this->gameRepository->findTopLikedGames($page, $limit);
+
+        return [
+            'items' => $this->attachLikeInfo($result['items'], $user),
+            'total' => $result['total'],
+        ];
+    }
+
     public function getGame(int $id): Game
     {
         $game = $this->findGameOrFail($id);

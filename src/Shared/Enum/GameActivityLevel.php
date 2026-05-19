@@ -11,9 +11,18 @@ enum GameActivityLevel: string
     public function getLabel(): string
     {
         return match($this) {
-            self::LOW => 'Низкая',
+            self::LOW    => 'Низкая',
             self::MEDIUM => 'Средняя',
-            self::HIGH => 'Высокая',
+            self::HIGH   => 'Высокая',
+        };
+    }
+
+    public function getDescription(): string
+    {
+        return match($this) {
+            self::LOW    => 'Низкая (спокойные, интеллектуальные игры, минимум бега)',
+            self::MEDIUM => 'Средняя (умеренный бег, эстафеты, подвижные игры)',
+            self::HIGH   => 'Высокая (интенсивный бег, прыжки, высокая физическая нагрузка)',
         };
     }
 

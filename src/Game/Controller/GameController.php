@@ -24,6 +24,7 @@ class GameController extends AbstractController
     public function __construct(
         private readonly GameService $gameService,
         private readonly GameGenerationService $gameGenerationService,
+        private readonly ApiResponse $apiResponse
     ) {}
 
     #[Route('/generate', name: 'generate', methods: ['POST'])]
@@ -32,7 +33,7 @@ class GameController extends AbstractController
         #[CurrentUser] User $user
     ): JsonResponse {
         $game = $this->gameGenerationService->generateAndSave($request, $user);
-        return ApiResponse::success(GameResponse::fromEntity($game), 201);
+        return $this->apiResponse->success(GameResponse::fromEntity($game), 201);
     }
 
     #[Route('', name: 'public', methods: ['GET'])]
@@ -42,7 +43,7 @@ class GameController extends AbstractController
     ): JsonResponse {
         $result = $this->gameService->getPublicGames($filters, $user);
 
-        return ApiResponse::success([
+        return $this->apiResponse->success([
             'items' => array_map(
                 fn($item) => GameResponse::fromEntity($item['game'], $item['isLiked']),
                 $result['items']
@@ -66,7 +67,7 @@ class GameController extends AbstractController
 
         $result = $this->gameService->getUserLikeGames($user, $page, $limit);
 
-        return ApiResponse::success([
+        return $this->apiResponse->success([
             'items' => array_map(
                 fn($item) => GameResponse::fromEntity($item['game'], $item['isLiked']),
                 $result['items']
@@ -89,7 +90,7 @@ class GameController extends AbstractController
 
             $result = $this->gameService->getUserGames($user, $page, $limit);
 
-            return ApiResponse::success([
+        return $this->apiResponse->success([
                 'items' => array_map(
                     fn($item) => GameResponse::fromEntity($item['game'], $item['isLiked']),
                     $result['items']
@@ -102,13 +103,36 @@ class GameController extends AbstractController
             ]);
     }
 
+    #[Route('/popular', name: 'popular', methods: ['GET'])]
+    public function listPopular(
+        Request $request,
+        #[CurrentUser] ?User $user
+    ): JsonResponse {
+        $page  = $request->query->getInt('page', 1);
+        $limit = $request->query->getInt('limit', 20);
+
+        $result = $this->gameService->getTopLikedGames($page, $limit, $user);
+
+        return $this->apiResponse->success([
+            'items' => array_map(
+                fn($item) => GameResponse::fromEntity($item['game'], $item['isLiked']),
+                $result['items']
+            ),
+            'pagination' => [
+                'page'  => $page,
+                'limit' => $limit,
+                'total' => $result['total'],
+            ],
+        ]);
+    }
+
     #[Route('/{id}', name: 'details', methods: ['GET'])]
     public function get(
         int $id,
         #[CurrentUser] ?User $user
     ): JsonResponse {
             $game = $this->gameService->getGame($id);
-            return ApiResponse::success(GameResponse::fromEntity($game));
+        return $this->apiResponse->success(GameResponse::fromEntity($game));
     }
 
     #[Route('/{id}', name: 'update', methods: ['PUT', 'PATCH'])]
@@ -118,7 +142,7 @@ class GameController extends AbstractController
         #[CurrentUser] User $user
     ): JsonResponse {
             $game = $this->gameService->updateGame($id, $request, $user);
-            return ApiResponse::success(GameResponse::fromEntity($game));
+            return $this->apiResponse->success(GameResponse::fromEntity($game));
     }
 
     #[Route('/{id}', name: 'delete', methods: ['DELETE'])]
@@ -127,6 +151,6 @@ class GameController extends AbstractController
         #[CurrentUser] User $user
     ): JsonResponse {
             $this->gameService->deleteGame($id, $user);
-            return ApiResponse::success(true, 204);
+            return $this->apiResponse->success(true, 204);
     }
 }

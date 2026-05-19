@@ -15,7 +15,8 @@ use Symfony\Component\Routing\Attribute\Route;
 final class AuthController extends AbstractController
 {
     public function __construct(
-        private readonly UserRegistrationService $registrationService
+        private readonly UserRegistrationService $registrationService,
+        private readonly ApiResponse $apiResponse
     ) {}
 
     #[Route('/register', name: 'register', methods: ['POST'])]
@@ -23,6 +24,6 @@ final class AuthController extends AbstractController
         #[MapRequestPayload] RegisterUserRequest $request
     ): JsonResponse {
         $user = $this->registrationService->register($request);
-        return ApiResponse::success(UserResponse::fromEntity($user), 201);
+        return $this->apiResponse->success(UserResponse::fromEntity($user), 201);
     }
 }

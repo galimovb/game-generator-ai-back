@@ -64,6 +64,7 @@ class Game
     private ?string $locationDescription = null;
 
     #[ORM\OneToMany(mappedBy: 'game', targetEntity: GameStage::class, cascade: ['persist', 'remove'])]
+    #[ORM\OrderBy(['stageOrder' => 'ASC'])]
     private Collection $stages;
 
     #[ORM\OneToMany(targetEntity: GameComment::class, mappedBy: 'game', orphanRemoval: true)]

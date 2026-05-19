@@ -19,7 +19,8 @@ use Symfony\Component\Security\Http\Attribute\CurrentUser;
 class GameCommentController extends AbstractController
 {
     public function __construct(
-        private readonly GameCommentService $commentService
+        private readonly GameCommentService $commentService,
+        private readonly ApiResponse $apiResponse
     ) {}
 
     #[Route('', name: 'list', methods: ['GET'])]
@@ -34,7 +35,7 @@ class GameCommentController extends AbstractController
 
         $result = $this->commentService->getGameComments($gameId, $page, $limit, $user);
 
-        return ApiResponse::success([
+        return $this->apiResponse->success([
             'items' => array_map(
                 fn($comment) => GameCommentResponse::fromEntity($comment),
                 $result['items']
@@ -55,7 +56,7 @@ class GameCommentController extends AbstractController
     ): JsonResponse {
         $comment = $this->commentService->createComment($gameId, $request, $user);
 
-        return ApiResponse::success(
+        return $this->apiResponse->success(
             GameCommentResponse::fromEntity($comment),
             201
         );
@@ -69,7 +70,7 @@ class GameCommentController extends AbstractController
     ): JsonResponse {
         $comment = $this->commentService->updateComment($id, $request, $user);
 
-        return ApiResponse::success(
+        return $this->apiResponse->success(
             GameCommentResponse::fromEntity($comment)
         );
     }
@@ -81,6 +82,6 @@ class GameCommentController extends AbstractController
     ): JsonResponse {
         $this->commentService->deleteComment($id, $user);
 
-        return ApiResponse::success(null, 204);
+        return $this->apiResponse->success(null, 204);
     }
 }

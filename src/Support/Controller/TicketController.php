@@ -20,7 +20,8 @@ use Symfony\Component\Security\Http\Attribute\CurrentUser;
 class TicketController extends AbstractController
 {
     public function __construct(
-        private readonly TicketService $ticketService
+        private readonly TicketService $ticketService,
+        private readonly ApiResponse $apiResponse
     ) {}
 
     #[Route('', name: 'create', methods: ['POST'])]
@@ -30,7 +31,7 @@ class TicketController extends AbstractController
     ): JsonResponse {
         $ticket = $this->ticketService->createTicket($request, $user);
 
-        return ApiResponse::success(
+        return $this->apiResponse->success(
             TicketResponse::fromEntity($ticket),
             201
         );
@@ -48,7 +49,7 @@ class TicketController extends AbstractController
 
         $result = $this->ticketService->getTicketList($user, $page, $limit, $status, $search);
 
-        return ApiResponse::success([
+        return $this->apiResponse->success([
             'items' => array_map(
                 fn($ticket) => TicketResponse::fromEntity($ticket),
                 $result['items']
@@ -68,7 +69,7 @@ class TicketController extends AbstractController
     ): JsonResponse {
         $ticket = $this->ticketService->getTicket($id, $user);
 
-        return ApiResponse::success(
+        return $this->apiResponse->success(
             TicketResponse::fromEntity($ticket)
         );
     }
@@ -80,7 +81,7 @@ class TicketController extends AbstractController
     ): JsonResponse {
         $ticket = $this->ticketService->takeTicket($id, $user);
 
-        return ApiResponse::success(
+        return $this->apiResponse->success(
             TicketResponse::fromEntity($ticket)
         );
     }
@@ -93,7 +94,7 @@ class TicketController extends AbstractController
     ): JsonResponse {
         $ticket = $this->ticketService->changeStatus($id, $request, $user);
 
-        return ApiResponse::success(
+        return $this->apiResponse->success(
             TicketResponse::fromEntity($ticket)
         );
     }
@@ -106,7 +107,7 @@ class TicketController extends AbstractController
     ): JsonResponse {
         $ticket = $this->ticketService->changePriority($id, $request, $user);
 
-        return ApiResponse::success(
+        return $this->apiResponse->success(
             TicketResponse::fromEntity($ticket)
         );
     }
@@ -118,7 +119,7 @@ class TicketController extends AbstractController
     ): JsonResponse {
         $ticket = $this->ticketService->closeTicket($id, $user);
 
-        return ApiResponse::success(
+        return $this->apiResponse->success(
             TicketResponse::fromEntity($ticket)
         );
     }

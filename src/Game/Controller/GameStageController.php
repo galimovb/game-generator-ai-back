@@ -19,7 +19,8 @@ use Symfony\Component\Security\Http\Attribute\CurrentUser;
 class GameStageController extends AbstractController
 {
     public function __construct(
-        private readonly GameStageService $stageService
+        private readonly GameStageService $stageService,
+        private readonly ApiResponse $apiResponse
     ) {}
 
     #[Route('', methods: ['POST'])]
@@ -29,7 +30,7 @@ class GameStageController extends AbstractController
         #[CurrentUser] User $user
     ): JsonResponse {
         $stage = $this->stageService->create($gameId, $request, $user);
-        return ApiResponse::success(GameStageResponse::fromEntity($stage), 201);
+        return $this->apiResponse->success(GameStageResponse::fromEntity($stage), 201);
     }
 
     #[Route('/{id}', methods: ['PUT', 'PATCH'])]
@@ -40,7 +41,7 @@ class GameStageController extends AbstractController
         #[CurrentUser] User $user
     ): JsonResponse {
         $stage = $this->stageService->update($gameId, $stage, $request, $user);
-        return ApiResponse::success(GameStageResponse::fromEntity($stage));
+        return $this->apiResponse->success(GameStageResponse::fromEntity($stage));
     }
 
     #[Route('/{id}', methods: ['DELETE'])]
@@ -50,6 +51,6 @@ class GameStageController extends AbstractController
         #[CurrentUser] User $user
     ): JsonResponse {
         $this->stageService->delete($gameId, $stage, $user);
-        return ApiResponse::success(true, 204);
+        return $this->apiResponse->success(true, 204);
     }
 }

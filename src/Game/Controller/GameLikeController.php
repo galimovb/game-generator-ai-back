@@ -14,7 +14,8 @@ use Symfony\Component\Security\Http\Attribute\CurrentUser;
 class GameLikeController extends AbstractController
 {
     public function __construct(
-        private readonly GameLikeService $gameLikeService
+        private readonly GameLikeService $gameLikeService,
+        private readonly ApiResponse $apiResponse
     ) {}
 
     #[Route('/{id}/like', name: 'game_like', methods: ['POST'])]
@@ -22,7 +23,7 @@ class GameLikeController extends AbstractController
     {
         $this->gameLikeService->like($id, $user);
 
-        return ApiResponse::success(null, 201);
+        return $this->apiResponse->success(null, 201);
     }
 
     #[Route('/{id}/like', name: 'game_unlike', methods: ['DELETE'])]
@@ -30,6 +31,6 @@ class GameLikeController extends AbstractController
     {
         $this->gameLikeService->unlike($id, $user);
 
-        return ApiResponse::success(null, 204);
+        return $this->apiResponse->success(null, 204);
     }
 }

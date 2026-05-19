@@ -9,6 +9,10 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 class ApiExceptionSubscriber implements EventSubscriberInterface
 {
+    public function __construct(
+        private readonly ApiResponse $apiResponse
+    ) {}
+
     public static function getSubscribedEvents(): array
     {
         return [
@@ -18,6 +22,6 @@ class ApiExceptionSubscriber implements EventSubscriberInterface
 
     public function onException(ExceptionEvent $event): void
     {
-        $event->setResponse(ApiResponse::error($event->getThrowable()));
+        $event->setResponse($this->apiResponse->error($event->getThrowable()));
     }
 }
