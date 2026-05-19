@@ -7,6 +7,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: GameJudgeLogRepository::class)]
+#[ORM\Table(name: "game_judge_logs")]
 #[ORM\HasLifecycleCallbacks]
 class GameJudgeLog
 {

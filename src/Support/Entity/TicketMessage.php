@@ -11,6 +11,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: TicketMessageRepository::class)]
+#[ORM\Table(name: "ticket_messages")]
 #[ORM\HasLifecycleCallbacks]
 class TicketMessage
 {

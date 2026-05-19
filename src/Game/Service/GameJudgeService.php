@@ -18,7 +18,7 @@ class GameJudgeService
         private readonly string $aiApiKey,
         private readonly string $aiApiUrl,
         private readonly LoggerInterface $logger,
-        private  GameGenerationService $gameGenerationService,
+        private readonly GameService $gameService,
     ) {}
 
     public function evaluate(array $aiData, GenerateGameRequest $request, array $photos = []): JudgeResult
@@ -90,7 +90,7 @@ class GameJudgeService
         $gameJson      = json_encode($aiData, JSON_UNESCAPED_UNICODE);
         $totalDuration = array_sum(array_column($aiData['stages'] ?? [], 'duration'));
         $passThreshold = self::PASS_THRESHOLD;
-        $ageLimit      = $this->gameGenerationService->getAgeSafetyConstraints($request->age);
+        $ageLimit     = $this->gameService->getAgeSafetyConstraints($request->age);
 
         $activityLabel = GameActivityLevel::from($request->activityLevel)->getLabel();
 

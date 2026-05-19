@@ -32,6 +32,7 @@ class GameGenerationService
         private readonly UploadService $uploadService,
         private readonly LoggerInterface $logger,
         private readonly GameJudgeService $judgeService,
+        private readonly GameService $gameService,
     ) {}
 
     public function generateAndSave(GenerateGameRequest $request, User $author): Game
@@ -285,7 +286,7 @@ class GameGenerationService
             $locationBlock = "\n\nОПИСАНИЕ МЕСТНОСТИ:\n{$request->locationDescription}\n\nОпирайся на это описание при создании игры.\n";
         }
 
-        $safetyConstraints = $this->getAgeSafetyConstraints($request->age);
+        $safetyConstraints = $this->gameService->getAgeSafetyConstraints($request->age);
 
         $feedbackBlock = '';
         if ($judgeFailReason) {
@@ -338,17 +339,6 @@ class GameGenerationService
 
 ВЕРНИ ТОЛЬКО JSON. НИКАКОГО ДРУГОГО ТЕКСТА.
 PROMPT;
-    }
-
-    public function getAgeSafetyConstraints(int $age): string
-    {
-        return match(true) {
-            $age <= 5  => "- Бег: не более 2 мин без остановки, дистанция до 20 м\n- Прыжки: только на месте или с места, высота не более 20 см\n- Предметы: не тяжелее 1 кг\n- Запрещено: столкновения, лазанье выше 1 м, спортивные снаряды (кольца, корзины), сложные правила",
-            $age <= 8  => "- Бег: до 5 мин, дистанция до 70 м\n- Прыжки: в длину, невысокие препятствия до 40 см; спортивные кольца/корзины ЗАПРЕЩЕНЫ (высота 3+ м недостижима)\n- Предметы: не тяжелее 2 кг; камни и тяжёлые снаряды ЗАПРЕЩЕНЫ\n- Запрещено: прыжки с высоты > 50 см, силовые столкновения, поднятие других детей",
-            $age <= 12 => "- Бег: до 10 мин, эстафеты допустимы\n- Прыжки: препятствия до 70 см\n- Предметы: не тяжелее 5 кг\n- Запрещено: поднятие партнёра, прыжки с высоты > 1 м, тяжёлые снаряды",
-            $age <= 17 => "- Интенсивные нагрузки допустимы\n- Предметы: до 10 кг\n- Запрещено: жёсткий силовой контакт, высоты без страховки",
-            default    => "- Стандартные нагрузки, умеренный командный контакт допустим",
-        };
     }
 
     private function saveJudgeLog(Game $game, JudgeResult $result, int $attempt): void

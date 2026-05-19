@@ -7,6 +7,7 @@ use App\User\Repository\UserSettingsRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: UserSettingsRepository::class)]
+#[ORM\Table(name: "user_settings")]
 class UserSettings
 {
     #[ORM\Id]
