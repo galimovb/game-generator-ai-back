@@ -15,11 +15,12 @@ class GameLikeController extends AbstractController
 {
     public function __construct(
         private readonly GameLikeService $gameLikeService,
-        private readonly ApiResponse $apiResponse
-    ) {}
+        private readonly ApiResponse $apiResponse,
+    ) {
+    }
 
     #[Route('/{id}/like', name: 'game_like', methods: ['POST'])]
-    public function like(int $id,  #[CurrentUser] User $user): JsonResponse
+    public function like(int $id, #[CurrentUser] User $user): JsonResponse
     {
         $this->gameLikeService->like($id, $user);
 
@@ -27,7 +28,7 @@ class GameLikeController extends AbstractController
     }
 
     #[Route('/{id}/like', name: 'game_unlike', methods: ['DELETE'])]
-    public function unlike(int $id,  #[CurrentUser] User $user): JsonResponse
+    public function unlike(int $id, #[CurrentUser] User $user): JsonResponse
     {
         $this->gameLikeService->unlike($id, $user);
 

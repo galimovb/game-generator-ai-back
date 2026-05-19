@@ -16,14 +16,16 @@ final class AuthController extends AbstractController
 {
     public function __construct(
         private readonly UserRegistrationService $registrationService,
-        private readonly ApiResponse $apiResponse
-    ) {}
+        private readonly ApiResponse $apiResponse,
+    ) {
+    }
 
     #[Route('/register', name: 'register', methods: ['POST'])]
     public function register(
-        #[MapRequestPayload] RegisterUserRequest $request
+        #[MapRequestPayload] RegisterUserRequest $request,
     ): JsonResponse {
         $user = $this->registrationService->register($request);
+
         return $this->apiResponse->success(UserResponse::fromEntity($user), 201);
     }
 }

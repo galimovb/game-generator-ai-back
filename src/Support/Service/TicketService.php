@@ -22,7 +22,8 @@ class TicketService
         private readonly EntityManagerInterface $em,
         private readonly TicketMessageService $messageService,
         private readonly TicketAccessService $accessService,
-    ) {}
+    ) {
+    }
 
     public function createTicket(CreateTicketRequest $request, User $user): Ticket
     {
@@ -71,8 +72,8 @@ class TicketService
 
         $ticket = $this->accessService->findTicketOrFail($id);
 
-        if ($ticket->getStatus() !== TicketStatus::OPEN &&
-            $ticket->getAssignedTo()?->getId() !== $user->getId()) {
+        if (TicketStatus::OPEN !== $ticket->getStatus()
+            && $ticket->getAssignedTo()?->getId() !== $user->getId()) {
             throw new ApiException(ErrorCode::FORBIDDEN);
         }
 
@@ -92,7 +93,7 @@ class TicketService
 
         $ticket = $this->accessService->findTicketOrFail($id);
 
-        if ($ticket->getStatus() === TicketStatus::CLOSED) {
+        if (TicketStatus::CLOSED === $ticket->getStatus()) {
             throw new ApiException(ErrorCode::TICKET_ALREADY_CLOSED);
         }
 
@@ -130,12 +131,12 @@ class TicketService
     {
         $ticket = $this->accessService->findTicketOrFail($id);
 
-        if (!$this->accessService->isSupportOrAdmin($user) &&
-            $ticket->getAuthor()->getId() !== $user->getId()) {
+        if (!$this->accessService->isSupportOrAdmin($user)
+            && $ticket->getAuthor()->getId() !== $user->getId()) {
             throw new ApiException(ErrorCode::FORBIDDEN);
         }
 
-        if ($ticket->getStatus() === TicketStatus::CLOSED) {
+        if (TicketStatus::CLOSED === $ticket->getStatus()) {
             throw new ApiException(ErrorCode::TICKET_ALREADY_CLOSED);
         }
 

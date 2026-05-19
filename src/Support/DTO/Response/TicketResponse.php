@@ -18,7 +18,8 @@ readonly class TicketResponse
         public string $createdAt,
         public ?string $updatedAt,
         public ?string $closedAt,
-    ) {}
+    ) {
+    }
 
     public static function fromEntity(Ticket $ticket): self
     {

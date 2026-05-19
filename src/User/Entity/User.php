@@ -2,7 +2,6 @@
 
 namespace App\User\Entity;
 
-use App\Game\Entity\Game;
 use App\Game\Entity\GameLike;
 use App\Support\Entity\Ticket;
 use App\User\Repository\UserRepository;
@@ -79,7 +78,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $this->likes = new ArrayCollection();
 
-        //Создаем дефолт настройки
+        // Создаем дефолт настройки
         $this->userSettings = new UserSettings();
         $this->userSettings->setOwner($this);
         $this->tickets = new ArrayCollection();
@@ -223,7 +222,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    #[\Override] public function eraseCredentials(): void
+    #[\Override]
+    public function eraseCredentials(): void
     {
         // TODO: Implement eraseCredentials() method.
     }

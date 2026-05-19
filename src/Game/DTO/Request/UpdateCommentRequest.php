@@ -9,6 +9,7 @@ readonly class UpdateCommentRequest
     public function __construct(
         #[Assert\NotBlank]
         #[Assert\Length(min: 1, max: 1000)]
-        public string $text
-    ) {}
+        public string $text,
+    ) {
+    }
 }

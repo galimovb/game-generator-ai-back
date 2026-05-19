@@ -15,7 +15,8 @@ readonly class GameStageResponse
         public ?array $tasks,
         public ?array $props,
         public string $createdAt,
-    ) {}
+    ) {
+    }
 
     public static function fromEntity(GameStage $stage): self
     {

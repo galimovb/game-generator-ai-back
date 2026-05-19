@@ -24,7 +24,8 @@ class TicketMessageService
         private readonly EntityManagerInterface $em,
         private readonly TicketAccessService $accessService,
         private UploadService $uploadService,
-    ) {}
+    ) {
+    }
 
     public function getMessages(int $ticketId, User $user, int $page, int $limit): array
     {
@@ -47,7 +48,7 @@ class TicketMessageService
 
         return [
             'items' => $items,
-            'total' => $total
+            'total' => $total,
         ];
     }
 
@@ -61,7 +62,7 @@ class TicketMessageService
             throw new ApiException(ErrorCode::FORBIDDEN);
         }
 
-        if ($ticket->getStatus() === TicketStatus::CLOSED) {
+        if (TicketStatus::CLOSED === $ticket->getStatus()) {
             throw new ApiException(ErrorCode::TICKET_ALREADY_CLOSED);
         }
 
@@ -100,12 +101,12 @@ class TicketMessageService
             throw new ApiException(ErrorCode::FORBIDDEN);
         }
 
-        if ($message->getMessageType() === TicketMessageType::SYSTEM) {
+        if (TicketMessageType::SYSTEM === $message->getMessageType()) {
             throw new ApiException(ErrorCode::FORBIDDEN);
         }
 
         $ticket = $message->getTicket();
-        if ($ticket->getStatus() === TicketStatus::CLOSED) {
+        if (TicketStatus::CLOSED === $ticket->getStatus()) {
             throw new ApiException(ErrorCode::TICKET_ALREADY_CLOSED);
         }
 
@@ -124,12 +125,12 @@ class TicketMessageService
             throw new ApiException(ErrorCode::FORBIDDEN);
         }
 
-        if ($message->getMessageType() === TicketMessageType::SYSTEM) {
+        if (TicketMessageType::SYSTEM === $message->getMessageType()) {
             throw new ApiException(ErrorCode::FORBIDDEN);
         }
 
         $ticket = $message->getTicket();
-        if ($ticket->getStatus() === TicketStatus::CLOSED) {
+        if (TicketStatus::CLOSED === $ticket->getStatus()) {
             throw new ApiException(ErrorCode::TICKET_ALREADY_CLOSED);
         }
 
@@ -150,7 +151,6 @@ class TicketMessageService
         $this->em->persist($message);
     }
 
-
     private function findMessageOrFail(int $id): TicketMessage
     {
         $message = $this->messageRepo->find($id);
@@ -166,12 +166,12 @@ class TicketMessageService
     {
         if ($isSupport) {
             $ticket->setStatus(
-                $ticket->getStatus() === TicketStatus::OPEN
+                TicketStatus::OPEN === $ticket->getStatus()
                     ? TicketStatus::IN_PROGRESS
                     : TicketStatus::WAITING_FOR_USER
             );
         } else {
-            if ($ticket->getStatus() === TicketStatus::WAITING_FOR_USER) {
+            if (TicketStatus::WAITING_FOR_USER === $ticket->getStatus()) {
                 $ticket->setStatus(TicketStatus::IN_PROGRESS);
             }
         }

@@ -44,13 +44,14 @@ readonly class UpdateGameRequest
         #[Assert\Type('boolean')]
         public ?bool $isPublic = null,
 
-        public ?string $locationDescription = null
-    ) {}
+        public ?string $locationDescription = null,
+    ) {
+    }
 
     #[Assert\Callback]
     public function validateLocationContext(ExecutionContextInterface $context): void
     {
-        if (empty($this->photos) && (empty($this->locationDescription) || trim($this->locationDescription) === '')) {
+        if (empty($this->photos) && (empty($this->locationDescription) || '' === trim($this->locationDescription))) {
             $context->buildViolation('Когда фото отсутствуют, обязательно укажите описание местности (locationDescription)')
                 ->atPath('locationDescription')
                 ->addViolation();

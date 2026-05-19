@@ -20,6 +20,7 @@ readonly class UpdateStageRequest
         public ?array $tasks = null,
 
         #[Assert\Type('array')]
-        public ?array $props = null
-    ) {}
+        public ?array $props = null,
+    ) {
+    }
 }

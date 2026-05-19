@@ -6,7 +6,6 @@ use App\User\DTO\Request\RegisterUserRequest;
 use App\User\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 final readonly class UserRegistrationService
 {
@@ -14,7 +13,8 @@ final readonly class UserRegistrationService
         private EntityManagerInterface $entityManager,
         private UserPasswordHasherInterface $passwordHasher,
         private UserService $userService,
-    ) {}
+    ) {
+    }
 
     public function register(RegisterUserRequest $request): User
     {

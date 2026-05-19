@@ -14,5 +14,6 @@ readonly class CreateTicketRequest
         #[Assert\NotBlank]
         #[Assert\Length(max: 5000)]
         public string $description,
-    ){}
+    ) {
+    }
 }

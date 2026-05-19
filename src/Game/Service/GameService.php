@@ -8,8 +8,8 @@ use App\Game\Entity\Game;
 use App\Game\Repository\GameLikeRepository;
 use App\Game\Repository\GameRepository;
 use App\Security\Voter\GameVoter;
-use App\Shared\Enum\GameActivityLevel;
 use App\Shared\Enum\ErrorCode;
+use App\Shared\Enum\GameActivityLevel;
 use App\Shared\Enum\GameLocationType;
 use App\Shared\Exception\ApiException;
 use App\User\Entity\User;
@@ -23,7 +23,8 @@ class GameService
         private readonly GameRepository $gameRepository,
         private readonly GameLikeRepository $gameLikeRepository,
         private readonly AuthorizationCheckerInterface $authChecker,
-    ) {}
+    ) {
+    }
 
     public function getPublicGames(GameListFilters $filters, ?User $user = null): array
     {
@@ -31,7 +32,7 @@ class GameService
 
         return [
             'items' => $this->attachLikeInfo($result['items'], $user),
-            'total' => $result['total']
+            'total' => $result['total'],
         ];
     }
 
@@ -46,14 +47,14 @@ class GameService
 
         $total = $this->gameLikeRepository->count(['author' => $user]);
 
-        $games = array_map(fn($like) => $like->getGame(), $likes);
+        $games = array_map(fn ($like) => $like->getGame(), $likes);
 
         return [
-            'items' => array_map(fn($game) => [
+            'items' => array_map(fn ($game) => [
                 'game' => $game,
                 'isLiked' => true,
             ], $games),
-            'total' => $total
+            'total' => $total,
         ];
     }
 
@@ -70,7 +71,7 @@ class GameService
 
         return [
             'items' => $this->attachLikeInfo($items, $user),
-            'total' => $total
+            'total' => $total,
         ];
     }
 
@@ -100,40 +101,40 @@ class GameService
         $game = $this->findGameOrFail($id);
         $this->checkAccess($game);
 
-        if ($request->title !== null) {
+        if (null !== $request->title) {
             $game->setTitle($request->title);
         }
-        if ($request->description !== null) {
+        if (null !== $request->description) {
             $game->setDescription($request->description);
         }
-        if ($request->age !== null) {
+        if (null !== $request->age) {
             $game->setAge($request->age);
         }
-        if ($request->players !== null) {
+        if (null !== $request->players) {
             $game->setPlayers($request->players);
         }
-        if ($request->duration !== null) {
+        if (null !== $request->duration) {
             $game->setDuration($request->duration);
         }
-        if ($request->locationType !== null) {
+        if (null !== $request->locationType) {
             $game->setLocationType(GameLocationType::from($request->locationType));
         }
-        if ($request->fieldWidth !== null) {
+        if (null !== $request->fieldWidth) {
             $game->setFieldWidth($request->fieldWidth);
         }
-        if ($request->fieldLength !== null) {
+        if (null !== $request->fieldLength) {
             $game->setFieldLength($request->fieldLength);
         }
-        if ($request->activityLevel !== null) {
+        if (null !== $request->activityLevel) {
             $game->setActivityLevel(GameActivityLevel::from($request->activityLevel));
         }
-        if ($request->requisites !== null) {
+        if (null !== $request->requisites) {
             $game->setRequisites($request->requisites);
         }
-        if ($request->isPublic !== null) {
+        if (null !== $request->isPublic) {
             $game->setIsPublic($request->isPublic);
         }
-        if ($request->locationDescription !== null) {
+        if (null !== $request->locationDescription) {
             $game->setLocationDescription($request->locationDescription);
         }
 
@@ -155,13 +156,13 @@ class GameService
     private function attachLikeInfo(array $games, ?User $user): array
     {
         if (!$user || empty($games)) {
-            return array_map(fn($game) => [
+            return array_map(fn ($game) => [
                 'game' => $game,
                 'isLiked' => false,
             ], $games);
         }
 
-        $gameIds = array_map(fn($game) => $game->getId(), $games);
+        $gameIds = array_map(fn ($game) => $game->getId(), $games);
         $likedIds = $this->gameLikeRepository->findLikedGameIds($user, $gameIds);
         $likedMap = array_flip($likedIds);
 
@@ -179,6 +180,7 @@ class GameService
         if (!$game) {
             throw new ApiException(ErrorCode::GAME_NOT_FOUND);
         }
+
         return $game;
     }
 
@@ -191,12 +193,12 @@ class GameService
 
     public function getAgeSafetyConstraints(int $age): string
     {
-        return match(true) {
-            $age <= 5  => "- Бег: не более 2 мин без остановки, дистанция до 20 м\n- Прыжки: только на месте или с места, высота не более 20 см\n- Предметы: не тяжелее 1 кг\n- Запрещено: столкновения, лазанье выше 1 м, спортивные снаряды (кольца, корзины), сложные правила",
-            $age <= 8  => "- Бег: до 5 мин, дистанция до 70 м\n- Прыжки: в длину, невысокие препятствия до 40 см; спортивные кольца/корзины ЗАПРЕЩЕНЫ (высота 3+ м недостижима)\n- Предметы: не тяжелее 2 кг; камни и тяжёлые снаряды ЗАПРЕЩЕНЫ\n- Запрещено: прыжки с высоты > 50 см, силовые столкновения, поднятие других детей",
+        return match (true) {
+            $age <= 5 => "- Бег: не более 2 мин без остановки, дистанция до 20 м\n- Прыжки: только на месте или с места, высота не более 20 см\n- Предметы: не тяжелее 1 кг\n- Запрещено: столкновения, лазанье выше 1 м, спортивные снаряды (кольца, корзины), сложные правила",
+            $age <= 8 => "- Бег: до 5 мин, дистанция до 70 м\n- Прыжки: в длину, невысокие препятствия до 40 см; спортивные кольца/корзины ЗАПРЕЩЕНЫ (высота 3+ м недостижима)\n- Предметы: не тяжелее 2 кг; камни и тяжёлые снаряды ЗАПРЕЩЕНЫ\n- Запрещено: прыжки с высоты > 50 см, силовые столкновения, поднятие других детей",
             $age <= 12 => "- Бег: до 10 мин, эстафеты допустимы\n- Прыжки: препятствия до 70 см\n- Предметы: не тяжелее 5 кг\n- Запрещено: поднятие партнёра, прыжки с высоты > 1 м, тяжёлые снаряды",
             $age <= 17 => "- Интенсивные нагрузки допустимы\n- Предметы: до 10 кг\n- Запрещено: жёсткий силовой контакт, высоты без страховки",
-            default    => "- Стандартные нагрузки, умеренный командный контакт допустим",
+            default => '- Стандартные нагрузки, умеренный командный контакт допустим',
         };
     }
 }

@@ -16,7 +16,8 @@ class GameStageService
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly GameService $gameService,
-    ) {}
+    ) {
+    }
 
     public function create(int $gameId, CreateStageRequest $request, User $user): GameStage
     {
@@ -47,19 +48,19 @@ class GameStageService
         $game = $this->gameService->getGame($gameId);
         $this->checkAccess($game, $user);
 
-        if ($request->title !== null) {
+        if (null !== $request->title) {
             $stage->setTitle($request->title);
         }
-        if ($request->description !== null) {
+        if (null !== $request->description) {
             $stage->setDescription($request->description);
         }
-        if ($request->duration !== null) {
+        if (null !== $request->duration) {
             $stage->setDuration($request->duration);
         }
-        if ($request->tasks !== null) {
+        if (null !== $request->tasks) {
             $stage->setTasks($request->tasks);
         }
-        if ($request->props !== null) {
+        if (null !== $request->props) {
             $stage->setProps($request->props);
         }
 
@@ -96,6 +97,7 @@ class GameStageService
                 $max = $stage->getStageOrder();
             }
         }
+
         return $max + 1;
     }
 }

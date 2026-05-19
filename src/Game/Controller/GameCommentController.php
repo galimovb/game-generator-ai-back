@@ -20,16 +20,16 @@ class GameCommentController extends AbstractController
 {
     public function __construct(
         private readonly GameCommentService $commentService,
-        private readonly ApiResponse $apiResponse
-    ) {}
+        private readonly ApiResponse $apiResponse,
+    ) {
+    }
 
     #[Route('', name: 'list', methods: ['GET'])]
     public function list(
         int $gameId,
         Request $request,
-        #[CurrentUser] User $user
-    ): JsonResponse
-    {
+        #[CurrentUser] User $user,
+    ): JsonResponse {
         $page = $request->query->getInt('page', 1);
         $limit = $request->query->getInt('limit', 20);
 
@@ -37,14 +37,14 @@ class GameCommentController extends AbstractController
 
         return $this->apiResponse->success([
             'items' => array_map(
-                fn($comment) => GameCommentResponse::fromEntity($comment),
+                fn ($comment) => GameCommentResponse::fromEntity($comment),
                 $result['items']
             ),
             'pagination' => [
                 'page' => $page,
                 'limit' => $limit,
-                'total' => $result['total']
-            ]
+                'total' => $result['total'],
+            ],
         ]);
     }
 
@@ -52,7 +52,7 @@ class GameCommentController extends AbstractController
     public function create(
         int $gameId,
         #[MapRequestPayload] CreateCommentRequest $request,
-        #[CurrentUser] User $user
+        #[CurrentUser] User $user,
     ): JsonResponse {
         $comment = $this->commentService->createComment($gameId, $request, $user);
 
@@ -66,7 +66,7 @@ class GameCommentController extends AbstractController
     public function update(
         int $id,
         #[MapRequestPayload] UpdateCommentRequest $request,
-        #[CurrentUser] User $user
+        #[CurrentUser] User $user,
     ): JsonResponse {
         $comment = $this->commentService->updateComment($id, $request, $user);
 
@@ -78,7 +78,7 @@ class GameCommentController extends AbstractController
     #[Route('/{id}', name: 'delete', methods: ['DELETE'])]
     public function delete(
         int $id,
-        #[CurrentUser] User $user
+        #[CurrentUser] User $user,
     ): JsonResponse {
         $this->commentService->deleteComment($id, $user);
 

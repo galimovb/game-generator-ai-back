@@ -19,22 +19,22 @@ class UploadService
     }
 
     /**
-     * Загружает фото из base64
+     * Загружает фото из base64.
      */
     public function uploadFromBase64(
         string $base64,
         UploadType $type,
-        ?int $entityId = null
+        ?int $entityId = null,
     ): string {
         // Парсим base64
         if (!preg_match('/^data:image\/(\w+);base64,/', $base64, $matches)) {
             throw new \InvalidArgumentException('Неверный формат base64');
         }
 
-        $extension = $matches[1] === 'jpeg' ? 'jpg' : $matches[1];
+        $extension = 'jpeg' === $matches[1] ? 'jpg' : $matches[1];
         $imageData = base64_decode(substr($base64, strpos($base64, ',') + 1), true);
 
-        if ($imageData === false) {
+        if (false === $imageData) {
             throw new \InvalidArgumentException('Не удалось декодировать base64');
         }
 
@@ -46,48 +46,49 @@ class UploadService
     }
 
     /**
-     * Удаляет файл
+     * Удаляет файл.
      */
     public function deleteFile(string $filePath): bool
     {
-        $fullPath = $this->uploadDirectory . '/' . ltrim($filePath, '/');
+        $fullPath = $this->uploadDirectory.'/'.ltrim($filePath, '/');
+
         return file_exists($fullPath) ? unlink($fullPath) : false;
     }
 
     /**
-     * Генерация хэшированного имени файла
+     * Генерация хэшированного имени файла.
      */
     private function generateHashedFilename(string $extension, UploadType $type, ?int $entityId = null): string
     {
         $data = $type->value;
         if ($entityId) {
-            $data .= '_' . $entityId;
+            $data .= '_'.$entityId;
         }
-        $data .= '_' . uniqid('', true);
+        $data .= '_'.uniqid('', true);
 
         // Создаем хэш
         $hash = hash('xxh64', $data); // Быстрый хэш
 
-        return $hash . '.' . $extension;
+        return $hash.'.'.$extension;
     }
 
     /**
-     * Сохранение файла из base64
+     * Сохранение файла из base64.
      */
     private function saveFile(string $data, string $filename, UploadType $type): string
     {
-        $uploadPath = $this->uploadDirectory . '/' . $type->getPath();
+        $uploadPath = $this->uploadDirectory.'/'.$type->getPath();
 
         if (!is_dir($uploadPath)) {
             mkdir($uploadPath, 0755, true);
         }
 
-        $filePath = $uploadPath . '/' . $filename;
+        $filePath = $uploadPath.'/'.$filename;
 
-        if (file_put_contents($filePath, $data) === false) {
+        if (false === file_put_contents($filePath, $data)) {
             throw new \RuntimeException('Не удалось сохранить файл');
         }
 
-        return '/' . $this->uploadDirectory . '/' . $type->getPath() . '/' . $filename;
+        return '/'.$this->uploadDirectory.'/'.$type->getPath().'/'.$filename;
     }
 }

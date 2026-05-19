@@ -12,12 +12,13 @@ readonly class CreateTicketMessageRequest
         public string $text,
 
         #[Assert\All([
-            new Assert\NotBlank,
+            new Assert\NotBlank(),
             new Assert\Type('string'),
-            new Assert\Regex('/^data:image\/(jpeg|png|webp|gif);base64,/')
+            new Assert\Regex('/^data:image\/(jpeg|png|webp|gif);base64,/'),
         ])]
         public array $photos = [],
-    ) {}
+    ) {
+    }
 
     #[Assert\Callback]
     public function validate(ExecutionContextInterface $context): void

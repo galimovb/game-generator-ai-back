@@ -7,7 +7,7 @@ use App\Shared\Trait\AuthorableTrait;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: GameLikeRepository::class)]
-#[ORM\Table(name: "game_likes")]
+#[ORM\Table(name: 'game_likes')]
 #[ORM\HasLifecycleCallbacks]
 class GameLike
 {

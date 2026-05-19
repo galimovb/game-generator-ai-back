@@ -20,14 +20,15 @@ class TicketMessageController extends AbstractController
 {
     public function __construct(
         private readonly TicketMessageService $messageService,
-        private readonly ApiResponse $apiResponse
-    ) {}
+        private readonly ApiResponse $apiResponse,
+    ) {
+    }
 
     #[Route('', name: 'list', methods: ['GET'])]
     public function getList(
         int $ticketId,
         Request $request,
-        #[CurrentUser] User $user
+        #[CurrentUser] User $user,
     ): JsonResponse {
         $page = $request->query->getInt('page', 1);
         $limit = $request->query->getInt('limit', 50);
@@ -36,14 +37,14 @@ class TicketMessageController extends AbstractController
 
         return $this->apiResponse->success([
             'items' => array_map(
-                fn($message) => TicketMessageResponse::fromEntity($message),
+                fn ($message) => TicketMessageResponse::fromEntity($message),
                 $result['items']
             ),
             'pagination' => [
                 'page' => $page,
                 'limit' => $limit,
-                'total' => $result['total']
-            ]
+                'total' => $result['total'],
+            ],
         ]);
     }
 
@@ -51,7 +52,7 @@ class TicketMessageController extends AbstractController
     public function create(
         int $ticketId,
         #[MapRequestPayload] CreateTicketMessageRequest $request,
-        #[CurrentUser] User $user
+        #[CurrentUser] User $user,
     ): JsonResponse {
         $message = $this->messageService->createMessage($ticketId, $request, $user);
 
@@ -65,7 +66,7 @@ class TicketMessageController extends AbstractController
     public function update(
         int $id,
         #[MapRequestPayload] UpdateTicketMessageRequest $request,
-        #[CurrentUser] User $user
+        #[CurrentUser] User $user,
     ): JsonResponse {
         $message = $this->messageService->updateMessage($id, $request, $user);
 
@@ -77,7 +78,7 @@ class TicketMessageController extends AbstractController
     #[Route('/{id}', name: 'delete', methods: ['DELETE'])]
     public function delete(
         int $id,
-        #[CurrentUser] User $user
+        #[CurrentUser] User $user,
     ): JsonResponse {
         $this->messageService->deleteMessage($id, $user);
 

@@ -20,32 +20,34 @@ class UserService
         private readonly EntityManagerInterface $entityManager,
         private readonly UploadService $uploadService,
         private readonly UserRepository $userRepository,
-    ) {}
+    ) {
+    }
+
     public function updateProfile(User $user, UpdateProfileRequest $request): User
     {
-        if ($request->name !== null) {
+        if (null !== $request->name) {
             $user->setName($request->name);
         }
 
-        if ($request->lastName !== null) {
+        if (null !== $request->lastName) {
             $user->setLastName($request->lastName);
         }
 
-        if ($request->middleName !== null) {
+        if (null !== $request->middleName) {
             $user->setMiddleName($request->middleName);
         }
 
-        if ($request->email !== null && $request->email !== $user->getEmail()) {
+        if (null !== $request->email && $request->email !== $user->getEmail()) {
             $this->checkEmailUnique($request->email);
             $user->setEmail($request->email);
         }
 
-        if ($request->login !== null && $request->login !== $user->getLogin()) {
+        if (null !== $request->login && $request->login !== $user->getLogin()) {
             $this->checkLoginUnique($request->login);
             $user->setLogin($request->login);
         }
 
-        if ($request->avatar !== null) {
+        if (null !== $request->avatar) {
             // Удаляем старый
             if ($user->getAvatar()) {
                 $this->uploadService->deleteFile($user->getAvatar());
@@ -61,7 +63,6 @@ class UserService
             // Сохраняем путь
             $user->setAvatar($avatarPath);
         }
-
 
         $this->entityManager->flush();
         $this->entityManager->refresh($user);

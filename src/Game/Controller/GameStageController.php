@@ -20,16 +20,18 @@ class GameStageController extends AbstractController
 {
     public function __construct(
         private readonly GameStageService $stageService,
-        private readonly ApiResponse $apiResponse
-    ) {}
+        private readonly ApiResponse $apiResponse,
+    ) {
+    }
 
     #[Route('', methods: ['POST'])]
     public function create(
         int $gameId,
         #[MapRequestPayload] CreateStageRequest $request,
-        #[CurrentUser] User $user
+        #[CurrentUser] User $user,
     ): JsonResponse {
         $stage = $this->stageService->create($gameId, $request, $user);
+
         return $this->apiResponse->success(GameStageResponse::fromEntity($stage), 201);
     }
 
@@ -38,9 +40,10 @@ class GameStageController extends AbstractController
         int $gameId,
         ?GameStage $stage = null,
         #[MapRequestPayload] UpdateStageRequest $request,
-        #[CurrentUser] User $user
+        #[CurrentUser] User $user,
     ): JsonResponse {
         $stage = $this->stageService->update($gameId, $stage, $request, $user);
+
         return $this->apiResponse->success(GameStageResponse::fromEntity($stage));
     }
 
@@ -48,9 +51,10 @@ class GameStageController extends AbstractController
     public function delete(
         int $gameId,
         ?GameStage $stage = null,
-        #[CurrentUser] User $user
+        #[CurrentUser] User $user,
     ): JsonResponse {
         $this->stageService->delete($gameId, $stage, $user);
+
         return $this->apiResponse->success(true, 204);
     }
 }

@@ -10,7 +10,7 @@ enum TicketSystemMessage: string
 
     public function getText(array $context = []): string
     {
-        return match($this) {
+        return match ($this) {
             self::STATUS_CHANGED => sprintf(
                 'Изменён статус тикета%s%s',
                 isset($context['old']) ? " с '{$context['old']}'" : '',

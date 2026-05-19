@@ -10,7 +10,6 @@ enum ModelType: string
 
     case QWEN3_5_9B = 'qwen/qwen3.5-9b';
 
-
     public static function values(): array
     {
         return array_column(self::cases(), 'value');

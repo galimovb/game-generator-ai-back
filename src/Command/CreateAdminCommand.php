@@ -44,6 +44,7 @@ class CreateAdminCommand extends Command
                 if (!filter_var($value, FILTER_VALIDATE_EMAIL)) {
                     throw new \RuntimeException('Invalid email');
                 }
+
                 return $value;
             });
         }
@@ -59,6 +60,7 @@ class CreateAdminCommand extends Command
                 if (strlen($value) < 6) {
                     throw new \RuntimeException('Password must be at least 6 characters');
                 }
+
                 return $value;
             });
         }
@@ -74,6 +76,7 @@ class CreateAdminCommand extends Command
                 $existingUser->setRoles(['ROLE_USER', 'ROLE_ADMIN']);
                 $this->entityManager->flush();
                 $io->success("User {$email} is now admin");
+
                 return Command::SUCCESS;
             }
 

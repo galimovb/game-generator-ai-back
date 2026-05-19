@@ -40,26 +40,26 @@ readonly class GenerateGameRequest
 
         #[Assert\All([
             new Assert\Type('string'),
-            new Assert\NotBlank,
-            new Assert\Length(max: 100)
+            new Assert\NotBlank(),
+            new Assert\Length(max: 100),
         ])]
         public ?array $requisites = null,
 
         #[Assert\All([
-            new Assert\NotBlank,
+            new Assert\NotBlank(),
             new Assert\Type('string'),
-            new Assert\Regex('/^data:image\/(jpeg|png|webp|gif);base64,/')
+            new Assert\Regex('/^data:image\/(jpeg|png|webp|gif);base64,/'),
         ])]
         public array $photos = [],
 
         public ?string $locationDescription = null,
-
-    ) {}
+    ) {
+    }
 
     #[Assert\Callback]
     public function validateLocationContext(ExecutionContextInterface $context): void
     {
-        if (empty($this->photos) && (empty($this->locationDescription) || trim($this->locationDescription) === '')) {
+        if (empty($this->photos) && (empty($this->locationDescription) || '' === trim($this->locationDescription))) {
             $context->buildViolation('Когда фото отсутствуют, обязательно укажите описание местности (locationDescription)')
                 ->atPath('locationDescription')
                 ->addViolation();

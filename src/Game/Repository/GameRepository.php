@@ -49,22 +49,22 @@ class GameRepository extends ServiceEntityRepository
             ->setParameter('isPublic', true);
 
         // Фильтры
-        if ($filters->minAge !== null) {
+        if (null !== $filters->minAge) {
             $qb->andWhere('g.age >= :minAge')->setParameter('minAge', $filters->minAge);
         }
-        if ($filters->maxAge !== null) {
+        if (null !== $filters->maxAge) {
             $qb->andWhere('g.age <= :maxAge')->setParameter('maxAge', $filters->maxAge);
         }
-        if ($filters->locationType !== null) {
+        if (null !== $filters->locationType) {
             $qb->andWhere('g.locationType = :locationType')->setParameter('locationType', $filters->locationType);
         }
-        if ($filters->activityLevel !== null) {
+        if (null !== $filters->activityLevel) {
             $qb->andWhere('g.activityLevel = :activityLevel')->setParameter('activityLevel', $filters->activityLevel);
         }
-        if ($filters->minPlayers !== null) {
+        if (null !== $filters->minPlayers) {
             $qb->andWhere('g.players >= :minPlayers')->setParameter('minPlayers', $filters->minPlayers);
         }
-        if ($filters->maxPlayers !== null) {
+        if (null !== $filters->maxPlayers) {
             $qb->andWhere('g.players <= :maxPlayers')->setParameter('maxPlayers', $filters->maxPlayers);
         }
 
@@ -72,7 +72,7 @@ class GameRepository extends ServiceEntityRepository
         $sortBy = in_array($filters->sortBy, ['createdAt', 'updatedAt', 'age', 'players', 'duration'])
             ? $filters->sortBy
             : 'createdAt';
-        $qb->orderBy("g.{$sortBy}", $filters->sortOrder === 'ASC' ? 'ASC' : 'DESC');
+        $qb->orderBy("g.{$sortBy}", 'ASC' === $filters->sortOrder ? 'ASC' : 'DESC');
 
         // Пагинация
         $qb->setFirstResult(($filters->page - 1) * $filters->limit)
@@ -82,7 +82,7 @@ class GameRepository extends ServiceEntityRepository
 
         return [
             'items' => $query->getResult(),
-            'total' => $this->countPublicGamesWithFilters($filters)
+            'total' => $this->countPublicGamesWithFilters($filters),
         ];
     }
 
@@ -94,22 +94,22 @@ class GameRepository extends ServiceEntityRepository
             ->setParameter('isPublic', true);
 
         // Повторяем те же фильтры
-        if ($filters->minAge !== null) {
+        if (null !== $filters->minAge) {
             $qb->andWhere('g.age >= :minAge')->setParameter('minAge', $filters->minAge);
         }
-        if ($filters->maxAge !== null) {
+        if (null !== $filters->maxAge) {
             $qb->andWhere('g.age <= :maxAge')->setParameter('maxAge', $filters->maxAge);
         }
-        if ($filters->locationType !== null) {
+        if (null !== $filters->locationType) {
             $qb->andWhere('g.locationType = :locationType')->setParameter('locationType', $filters->locationType);
         }
-        if ($filters->activityLevel !== null) {
+        if (null !== $filters->activityLevel) {
             $qb->andWhere('g.activityLevel = :activityLevel')->setParameter('activityLevel', $filters->activityLevel);
         }
-        if ($filters->minPlayers !== null) {
+        if (null !== $filters->minPlayers) {
             $qb->andWhere('g.players >= :minPlayers')->setParameter('minPlayers', $filters->minPlayers);
         }
-        if ($filters->maxPlayers !== null) {
+        if (null !== $filters->maxPlayers) {
             $qb->andWhere('g.players <= :maxPlayers')->setParameter('maxPlayers', $filters->maxPlayers);
         }
 

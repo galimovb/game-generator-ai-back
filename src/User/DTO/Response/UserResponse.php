@@ -18,7 +18,8 @@ readonly class UserResponse
         public bool $isActive,
         public bool $isBlocked,
         public bool $isVerified,
-    ) {}
+    ) {
+    }
 
     public static function fromEntity(User $user): self
     {

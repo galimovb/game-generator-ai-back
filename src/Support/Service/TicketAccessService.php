@@ -3,7 +3,6 @@
 namespace App\Support\Service;
 
 use App\Shared\Enum\ErrorCode;
-use App\Shared\Enum\TicketStatus;
 use App\Shared\Exception\ApiException;
 use App\Support\Entity\Ticket;
 use App\Support\Repository\TicketRepository;
@@ -13,7 +12,8 @@ class TicketAccessService
 {
     public function __construct(
         private readonly TicketRepository $ticketRepo,
-    ) {}
+    ) {
+    }
 
     public function findTicketOrFail(int $id): Ticket
     {

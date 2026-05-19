@@ -8,9 +8,9 @@ enum GameLocationType: string
     case OUTDOOR = 'outdoor';
     case BOTH = 'both';
 
-    public function getValue():string
+    public function getValue(): string
     {
-        return match($this) {
+        return match ($this) {
             self::INDOOR => 'В помещении',
             self::OUTDOOR => 'На улице',
             self::BOTH => 'Совмещенно',
@@ -21,5 +21,4 @@ enum GameLocationType: string
     {
         return array_column(self::cases(), 'value');
     }
-
 }

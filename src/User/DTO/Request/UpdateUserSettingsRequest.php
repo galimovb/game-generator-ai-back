@@ -15,5 +15,6 @@ readonly class UpdateUserSettingsRequest
         #[Assert\NotNull]
         #[Assert\Range(min: 0, max: 1)]
         public float $generationCreative,
-    ) {}
+    ) {
+    }
 }

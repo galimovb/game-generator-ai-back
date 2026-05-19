@@ -32,7 +32,7 @@ class GameVoter extends Voter
         /** @var Game $game */
         $game = $subject;
 
-        return match($attribute) {
+        return match ($attribute) {
             self::MANAGE => $this->canManage($user, $game),
             self::VIEW => $this->canView($user, $game),
             self::EDIT => $this->canEdit($user, $game),

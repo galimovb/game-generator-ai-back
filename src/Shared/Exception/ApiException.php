@@ -8,7 +8,7 @@ class ApiException extends \RuntimeException
 {
     public function __construct(
         private readonly ErrorCode $errorCode,
-        ?string $customMessage = null
+        ?string $customMessage = null,
     ) {
         parent::__construct($customMessage ?? $errorCode->getMessage());
     }

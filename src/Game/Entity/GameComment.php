@@ -10,7 +10,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: GameCommentRepository::class)]
-#[ORM\Table(name: "game_comments")]
+#[ORM\Table(name: 'game_comments')]
 #[ORM\HasLifecycleCallbacks]
 class GameComment
 {

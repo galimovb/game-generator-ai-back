@@ -15,7 +15,8 @@ readonly class GameCommentResponse
         public ?int $parentId,
         public string $createdAt,
         public ?string $updatedAt,
-    ) {}
+    ) {
+    }
 
     public static function fromEntity(GameComment $gameComment): self
     {

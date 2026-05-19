@@ -7,11 +7,11 @@ use App\User\Entity\UserSettings;
 
 readonly class UserSettingsResponse
 {
-
     public function __construct(
         public ?ModelType $generationModel,
         public ?float $generationCreative,
-    ) {}
+    ) {
+    }
 
     public static function fromEntity(UserSettings $userSettings): self
     {

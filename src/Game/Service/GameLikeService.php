@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Game\Service;
 
 use App\Game\Entity\GameLike;
@@ -16,7 +15,8 @@ class GameLikeService
         private GameLikeRepository $repo,
         private EntityManagerInterface $em,
         private GameService $gameService,
-    ) {}
+    ) {
+    }
 
     public function like(int $gameId, User $user): void
     {
@@ -26,7 +26,7 @@ class GameLikeService
             'game' => $game,
         ]);
 
-        if($favorite){
+        if ($favorite) {
             throw new ApiException(ErrorCode::LIKE_EXIST);
         }
 

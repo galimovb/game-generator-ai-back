@@ -26,5 +26,6 @@ readonly class RegisterUserRequest
 
         #[Assert\Length(max: 255)]
         public ?string $middleName = null,
-    ) {}
+    ) {
+    }
 }

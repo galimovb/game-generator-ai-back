@@ -20,8 +20,9 @@ class UserController extends AbstractController
 {
     public function __construct(
         private readonly UserService $userService,
-        private readonly ApiResponse $apiResponse
-    ) {}
+        private readonly ApiResponse $apiResponse,
+    ) {
+    }
 
     #[Route('/profile', name: 'profile', methods: ['GET'])]
     public function profile(#[CurrentUser] User $user): JsonResponse
@@ -32,16 +33,18 @@ class UserController extends AbstractController
     #[Route('/profile', name: 'profile_update', methods: ['PUT', 'PATCH'])]
     public function updateProfile(
         #[CurrentUser] User $user,
-        #[MapRequestPayload] UpdateProfileRequest $request
+        #[MapRequestPayload] UpdateProfileRequest $request,
     ): JsonResponse {
-            $user = $this->userService->updateProfile($user, $request);
-            return $this->apiResponse->success(UserResponse::fromEntity($user));
+        $user = $this->userService->updateProfile($user, $request);
+
+        return $this->apiResponse->success(UserResponse::fromEntity($user));
     }
 
     #[Route('/{id}', name: 'get', methods: ['GET'])]
     public function get(int $id): JsonResponse
     {
-            $user = $this->userService->getUser($id);
+        $user = $this->userService->getUser($id);
+
         return $this->apiResponse->success(UserResponse::fromEntity($user));
     }
 
@@ -56,9 +59,8 @@ class UserController extends AbstractController
     #[Route('/profile/settings', name: 'profile_settings_update', methods: ['PUT', 'PATCH'])]
     public function updateSettings(
         #[CurrentUser] User $user,
-        #[MapRequestPayload] UpdateUserSettingsRequest $request
-    ): JsonResponse
-    {
+        #[MapRequestPayload] UpdateUserSettingsRequest $request,
+    ): JsonResponse {
         $settings = $this->userService->updateSettings($user, $request);
 
         return $this->apiResponse->success(UserSettingsResponse::fromEntity($settings));

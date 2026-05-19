@@ -3,7 +3,6 @@
 namespace App\Support\Entity;
 
 use App\Shared\Enum\TicketMessageType;
-use App\Shared\Trait\AuthorableTrait;
 use App\Shared\Trait\TimestampableTrait;
 use App\Support\Repository\TicketMessageRepository;
 use App\User\Entity\User;
@@ -11,7 +10,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: TicketMessageRepository::class)]
-#[ORM\Table(name: "ticket_messages")]
+#[ORM\Table(name: 'ticket_messages')]
 #[ORM\HasLifecycleCallbacks]
 class TicketMessage
 {

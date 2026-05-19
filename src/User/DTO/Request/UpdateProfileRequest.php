@@ -26,6 +26,7 @@ readonly class UpdateProfileRequest
         public ?string $login = null,
 
         #[Assert\Regex(pattern: '/^data:image\/(jpeg|png|webp);base64,/', message: 'Неверный формат base64 изображения')]
-        public ?string $avatar = null
-    ) {}
+        public ?string $avatar = null,
+    ) {
+    }
 }

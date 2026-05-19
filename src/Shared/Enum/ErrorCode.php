@@ -30,7 +30,7 @@ enum ErrorCode: string
 
     public function getMessage(): string
     {
-        return match($this) {
+        return match ($this) {
             self::EMAIL_EXIST => 'Пользователь с таким email уже существует',
             self::LOGIN_EXIST => 'Пользователь с таким логином уже существует',
             self::LIKE_EXIST => 'Эта игра уже в избранном',
@@ -56,9 +56,9 @@ enum ErrorCode: string
 
     public function getHttpCode(): int
     {
-        return match($this) {
+        return match ($this) {
             self::EMAIL_EXIST, self::LOGIN_EXIST, self::VALIDATION_FAILED, self::LIKE_EXIST, self::TICKET_ALREADY_CLOSED, self::GENERATION_FAILED, self::SAFETY_CHECK_FAILED => 422,
-            self::UNAUTHORIZED, self::INVALID_CREDENTIALS, self::TOKEN_EXPIRED, self::TOKEN_INVALID, self::TOKEN_MISSING   => 401,
+            self::UNAUTHORIZED, self::INVALID_CREDENTIALS, self::TOKEN_EXPIRED, self::TOKEN_INVALID, self::TOKEN_MISSING => 401,
             self::FORBIDDEN => 403,
             self::NOT_FOUND, self::COMMENT_NOT_FOUND, self::GAME_NOT_FOUND, self::STAGE_NOT_FOUND, self::USER_NOT_FOUND, self::LIKE_NOT_FOUND => 404,
             self::INTERNAL_ERROR => 500,

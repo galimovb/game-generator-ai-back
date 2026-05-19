@@ -11,7 +11,7 @@ enum TicketPriority: string
 
     public function getLabel(): string
     {
-        return match($this) {
+        return match ($this) {
             self::LOW => 'Низкий',
             self::MEDIUM => 'Средний',
             self::HIGH => 'Высокий',
@@ -21,6 +21,6 @@ enum TicketPriority: string
 
     public static function values(): array
     {
-        return array_map(fn(self $case) => $case->value, self::cases());
+        return array_map(fn (self $case) => $case->value, self::cases());
     }
 }

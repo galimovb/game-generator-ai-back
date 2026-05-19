@@ -13,8 +13,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class JwtExceptionSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly ApiResponse $apiResponse
-    ) {}
+        private readonly ApiResponse $apiResponse,
+    ) {
+    }
 
     public static function getSubscribedEvents(): array
     {

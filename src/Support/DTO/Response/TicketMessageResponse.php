@@ -8,14 +8,15 @@ use App\User\DTO\Response\UserResponse;
 readonly class TicketMessageResponse
 {
     public function __construct(
-        public int           $id,
-        public ?string       $text,
-        public ?array        $photos,
-        public string        $messageType,
+        public int $id,
+        public ?string $text,
+        public ?array $photos,
+        public string $messageType,
         public ?UserResponse $author,
-        public string        $createdAt,
-        public ?string       $updatedAt,
-    ) {}
+        public string $createdAt,
+        public ?string $updatedAt,
+    ) {
+    }
 
     public static function fromEntity(TicketMessage $message): self
     {

@@ -33,49 +33,47 @@ class GameGenerationService
         private readonly LoggerInterface $logger,
         private readonly GameJudgeService $judgeService,
         private readonly GameService $gameService,
-    ) {}
+    ) {
+    }
 
     public function generateAndSave(GenerateGameRequest $request, User $author): Game
     {
         $settings = $author->getUserSettings();
-        $model    = $settings->getGenerationModel()->value;
+        $model = $settings->getGenerationModel()->value;
         $creative = $settings->getGenerationCreative();
 
-        $savedPhotos     = $this->saveRequestPhotos($request, $author->getId());
+        $savedPhotos = $this->saveRequestPhotos($request, $author->getId());
         $judgeFailReason = null;
         $lastJudgeResult = null;
 
-        for ($attempt = 1; $attempt <= self::MAX_JUDGE_RETRIES; $attempt++) {
-            $aiData          = $this->callAI($request, $request->photos, $model, $creative, judgeFailReason: $judgeFailReason);
-            $judgeResult     = $this->judgeService->evaluate($aiData, $request, $request->photos);
+        for ($attempt = 1; $attempt <= self::MAX_JUDGE_RETRIES; ++$attempt) {
+            $aiData = $this->callAI($request, $request->photos, $model, $creative, judgeFailReason: $judgeFailReason);
+            $judgeResult = $this->judgeService->evaluate($aiData, $request, $request->photos);
             $lastJudgeResult = $judgeResult;
 
             if ($judgeResult->passed) {
                 $game = $this->saveGame($aiData, $author, $request, $savedPhotos);
                 $this->saveJudgeLog($game, $judgeResult, $attempt);
+
                 return $game;
             }
 
             $judgeFailReason = implode(' ', array_filter([
                 $judgeResult->failReason,
-                !empty($judgeResult->safetyIssues) ? 'Проблемы безопасности: ' . implode('; ', $judgeResult->safetyIssues) : null,
+                !empty($judgeResult->safetyIssues) ? 'Проблемы безопасности: '.implode('; ', $judgeResult->safetyIssues) : null,
             ]));
 
             $this->logger->warning('Judge rejected game, retrying', [
-                'attempt'       => $attempt,
-                'max'           => self::MAX_JUDGE_RETRIES,
-                'is_safe'       => $judgeResult->isSafe,
-                'score'         => $judgeResult->score,
+                'attempt' => $attempt,
+                'max' => self::MAX_JUDGE_RETRIES,
+                'is_safe' => $judgeResult->isSafe,
+                'score' => $judgeResult->score,
                 'safety_issues' => $judgeResult->safetyIssues,
-                'fail_reason'   => $judgeResult->failReason,
+                'fail_reason' => $judgeResult->failReason,
             ]);
         }
 
-        throw new ApiException(
-            ($lastJudgeResult?->isSafe === false)
-                ? ErrorCode::SAFETY_CHECK_FAILED
-                : ErrorCode::GENERATION_FAILED
-        );
+        throw new ApiException((false === $lastJudgeResult?->isSafe) ? ErrorCode::SAFETY_CHECK_FAILED : ErrorCode::GENERATION_FAILED);
     }
 
     private function saveRequestPhotos(GenerateGameRequest $request, int $authorId): array
@@ -98,13 +96,13 @@ class GameGenerationService
     {
         $prompt = $this->buildPrompt($request, $judgeFailReason);
         $userContent = [
-            ['type' => 'text', 'text' => $prompt]
+            ['type' => 'text', 'text' => $prompt],
         ];
 
         foreach ($requestPhotos as $photoBase64) {
             $userContent[] = [
                 'type' => 'image_url',
-                'image_url' => ['url' => $photoBase64]
+                'image_url' => ['url' => $photoBase64],
             ];
         }
 
@@ -125,12 +123,12 @@ class GameGenerationService
         $messages = [
             [
                 'role' => 'system',
-                'content' => $this->buildSystemPrompt($request)
+                'content' => $this->buildSystemPrompt($request),
             ],
             [
                 'role' => 'user',
-                'content' => $userContent
-            ]
+                'content' => $userContent,
+            ],
         ];
 
         $payload = [
@@ -141,18 +139,19 @@ class GameGenerationService
             'response_format' => ['type' => 'json_object'],
         ];
 
-        for ($attempt = 1; $attempt <= $retryCount; $attempt++) {
+        for ($attempt = 1; $attempt <= $retryCount; ++$attempt) {
             try {
                 $result = $this->sendCloudRequest($payload, $attempt);
                 $this->validateAiResponse($result);
+
                 return $result;
             } catch (ApiException $e) {
-                $this->logger->warning('AI response validation failed, attempt ' . $attempt);
+                $this->logger->warning('AI response validation failed, attempt '.$attempt);
                 if ($attempt === $retryCount) {
                     throw $e;
                 }
             } catch (\Exception $e) {
-                $this->logger->error('AI request failed, attempt ' . $attempt, [
+                $this->logger->error('AI request failed, attempt '.$attempt, [
                     'error' => $e->getMessage(),
                 ]);
                 if ($attempt === $retryCount) {
@@ -160,6 +159,7 @@ class GameGenerationService
                     try {
                         $result = $this->sendOllamaRequest($payload);
                         $this->validateAiResponse($result);
+
                         return $result;
                     } catch (\Exception $ollamaEx) {
                         $this->logger->error('Ollama fallback failed', [
@@ -176,9 +176,9 @@ class GameGenerationService
 
     private function sendCloudRequest(array $payload, int $attempt): array
     {
-        $response = $this->httpClient->request('POST', $this->aiApiUrl . '/chat/completions', [
+        $response = $this->httpClient->request('POST', $this->aiApiUrl.'/chat/completions', [
             'headers' => [
-                'Authorization' => 'Bearer ' . $this->aiApiKey,
+                'Authorization' => 'Bearer '.$this->aiApiKey,
                 'Content-Type' => 'application/json',
             ],
             'json' => $payload,
@@ -192,7 +192,7 @@ class GameGenerationService
                 'attempt' => $attempt,
                 'status_code' => $statusCode,
             ]);
-            throw new \RuntimeException('Cloud AI server error: HTTP ' . $statusCode);
+            throw new \RuntimeException('Cloud AI server error: HTTP '.$statusCode);
         }
 
         $data = $response->toArray();
@@ -201,13 +201,13 @@ class GameGenerationService
         $this->logger->info('Cloud AI Response', [
             'attempt' => $attempt,
             'content_length' => strlen($content),
-            'content_preview' => substr($content, 0, 500)
+            'content_preview' => substr($content, 0, 500),
         ]);
 
         $result = json_decode($content, true);
 
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            $this->logger->warning('Invalid JSON from cloud AI, attempt ' . $attempt);
+        if (JSON_ERROR_NONE !== json_last_error()) {
+            $this->logger->warning('Invalid JSON from cloud AI, attempt '.$attempt);
             throw new ApiException(ErrorCode::GENERATION_FAILED);
         }
 
@@ -223,7 +223,7 @@ class GameGenerationService
             'model' => $fallbackModel,
         ]);
 
-        $response = $this->httpClient->request('POST', $this->ollamaApiUrl . '/api/chat/completions', [
+        $response = $this->httpClient->request('POST', $this->ollamaApiUrl.'/api/chat/completions', [
             'headers' => [
                 'Content-Type' => 'application/json',
             ],
@@ -234,7 +234,7 @@ class GameGenerationService
         $statusCode = $response->getStatusCode();
 
         if ($statusCode >= 400) {
-            throw new \RuntimeException('Ollama returned error: HTTP ' . $statusCode);
+            throw new \RuntimeException('Ollama returned error: HTTP '.$statusCode);
         }
 
         $data = $response->toArray();
@@ -242,12 +242,12 @@ class GameGenerationService
 
         $this->logger->info('Ollama Response', [
             'content_length' => strlen($content),
-            'content_preview' => substr($content, 0, 500)
+            'content_preview' => substr($content, 0, 500),
         ]);
 
         $result = json_decode($content, true);
 
-        if (json_last_error() !== JSON_ERROR_NONE) {
+        if (JSON_ERROR_NONE !== json_last_error()) {
             throw new ApiException(ErrorCode::GENERATION_FAILED);
         }
 
@@ -259,11 +259,11 @@ class GameGenerationService
         $base = 'Ты опытный вожатый с 10+ лет стажа. Твой приоритет — безопасность детей. Создавай только физически безопасные игры для указанного возраста. Отвечай только в JSON.';
 
         if (!empty($request->photos)) {
-            return $base . ' Проанализируй фото местности.';
+            return $base.' Проанализируй фото местности.';
         }
 
         if (!empty($request->locationDescription)) {
-            return $base . ' Проанализируй описание местности.';
+            return $base.' Проанализируй описание местности.';
         }
 
         return $base;
@@ -271,7 +271,7 @@ class GameGenerationService
 
     private function buildPrompt(GenerateGameRequest $request, ?string $judgeFailReason = null): string
     {
-        $examples     = $this->getRandomExamples();
+        $examples = $this->getRandomExamples();
         $examplesJson = json_encode($examples, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
 
         $requisitesText = !empty($request->requisites)
@@ -279,7 +279,7 @@ class GameGenerationService
             : 'не указан';
 
         $activityLevelText = GameActivityLevel::from($request->activityLevel)->getDescription();
-        $locationTypeText  = GameLocationType::from($request->locationType)->getValue();
+        $locationTypeText = GameLocationType::from($request->locationType)->getValue();
 
         $locationBlock = '';
         if (!empty($request->locationDescription)) {
@@ -359,7 +359,7 @@ PROMPT;
 
     private function getRandomExamples(): array
     {
-        $path = __DIR__ . '/../train/base.json';
+        $path = __DIR__.'/../train/base.json';
 
         if (!file_exists($path)) {
             return [];
@@ -373,6 +373,7 @@ PROMPT;
         }
 
         shuffle($games);
+
         return array_slice($games, 0, 5);
     }
 
@@ -386,7 +387,7 @@ PROMPT;
             throw new ApiException(ErrorCode::GENERATION_FAILED);
         }
 
-        if (empty($aiData['stages']) || !is_array($aiData['stages']) || count($aiData['stages']) === 0) {
+        if (empty($aiData['stages']) || !is_array($aiData['stages']) || 0 === count($aiData['stages'])) {
             throw new ApiException(ErrorCode::GENERATION_FAILED);
         }
 
@@ -407,7 +408,7 @@ PROMPT;
             $totalDuration += (int) $stage['duration'];
         }
 
-        if ($totalDuration === 0) {
+        if (0 === $totalDuration) {
             throw new ApiException(ErrorCode::GENERATION_FAILED);
         }
     }
@@ -437,7 +438,7 @@ PROMPT;
             $stage = new GameStage();
             $stage->setGame($game);
             $stage->setStageOrder($index + 1);
-            $stage->setTitle($stageData['title'] ?? 'Этап ' . ($index + 1));
+            $stage->setTitle($stageData['title'] ?? 'Этап '.($index + 1));
             $stage->setDescription($stageData['description'] ?? '');
             $stage->setDuration($stageData['duration'] ?? 10);
             $stage->setTasks($stageData['tasks'] ?? []);

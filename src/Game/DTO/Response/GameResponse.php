@@ -31,11 +31,12 @@ readonly class GameResponse
         public string $createdAt,
         public ?string $updatedAt,
         public ?string $locationDescription = null,
-    ) {}
+    ) {
+    }
 
     public static function fromEntity(
         Game $game,
-        bool $isLiked = false
+        bool $isLiked = false,
     ): self {
         return new self(
             id: $game->getId(),
@@ -53,7 +54,7 @@ readonly class GameResponse
             requisites: $game->getRequisites(),
             isPublic: $game->isPublic(),
             stages: array_map(
-                fn($stage) => GameStageResponse::fromEntity($stage),
+                fn ($stage) => GameStageResponse::fromEntity($stage),
                 $game->getStages()->toArray()
             ),
             commentsCount: count($game->getComments()),

@@ -10,6 +10,7 @@ readonly class ChangeTicketStatusRequest
     public function __construct(
         #[Assert\NotBlank]
         #[Assert\Choice(callback: [TicketStatus::class, 'values'])]
-        public string $status
-    ) {}
+        public string $status,
+    ) {
+    }
 }

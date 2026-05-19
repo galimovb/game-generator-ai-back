@@ -43,8 +43,8 @@ class TicketRepository extends ServiceEntityRepository
 
     public function findWithSearch(array $criteria, ?string $search, int $limit, int $offset): array
     {
-        if ($search !== null) {
-            $search = '%' . trim(preg_replace('/\s+/', ' ', $search)) . '%';
+        if (null !== $search) {
+            $search = '%'.trim(preg_replace('/\s+/', ' ', $search)).'%';
         }
 
         $qb = $this->createQueryBuilder('t');

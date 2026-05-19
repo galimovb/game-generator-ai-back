@@ -19,6 +19,7 @@ trait AuthorableTrait
     public function setAuthor(?User $author): static
     {
         $this->author = $author;
+
         return $this;
     }
 }

@@ -13,7 +13,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: GameRepository::class)]
-#[ORM\Table(name: "games")]
+#[ORM\Table(name: 'games')]
 #[ORM\HasLifecycleCallbacks]
 class Game
 {
@@ -94,6 +94,7 @@ class Game
     public function setTitle(?string $title): static
     {
         $this->title = $title;
+
         return $this;
     }
 
@@ -105,6 +106,7 @@ class Game
     public function setDescription(?string $description): static
     {
         $this->description = $description;
+
         return $this;
     }
 
@@ -116,6 +118,7 @@ class Game
     public function setAge(?int $age): static
     {
         $this->age = $age;
+
         return $this;
     }
 
@@ -127,6 +130,7 @@ class Game
     public function setPlayers(?int $players): static
     {
         $this->players = $players;
+
         return $this;
     }
 
@@ -138,6 +142,7 @@ class Game
     public function setDuration(?int $duration): static
     {
         $this->duration = $duration;
+
         return $this;
     }
 
@@ -149,6 +154,7 @@ class Game
     public function setLocationType(?GameLocationType $locationType): static
     {
         $this->locationType = $locationType;
+
         return $this;
     }
 
@@ -160,6 +166,7 @@ class Game
     public function setFieldWidth(?int $fieldWidth): static
     {
         $this->fieldWidth = $fieldWidth;
+
         return $this;
     }
 
@@ -171,6 +178,7 @@ class Game
     public function setFieldLength(?int $fieldLength): static
     {
         $this->fieldLength = $fieldLength;
+
         return $this;
     }
 
@@ -182,6 +190,7 @@ class Game
     public function setActivityLevel(?GameActivityLevel $activityLevel): static
     {
         $this->activityLevel = $activityLevel;
+
         return $this;
     }
 
@@ -193,6 +202,7 @@ class Game
     public function setPhotos(?array $photos): static
     {
         $this->photos = $photos;
+
         return $this;
     }
 
@@ -204,6 +214,7 @@ class Game
     public function setRequisites(?array $requisites): static
     {
         $this->requisites = $requisites;
+
         return $this;
     }
 
@@ -215,6 +226,7 @@ class Game
     public function setIsPublic(bool $isPublic): static
     {
         $this->isPublic = $isPublic;
+
         return $this;
     }
 
@@ -236,6 +248,7 @@ class Game
     public function setStages(Collection $stages): static
     {
         $this->stages = $stages;
+
         return $this;
     }
 
@@ -250,6 +263,7 @@ class Game
             $this->comments->add($comment);
             $comment->setGame($this);
         }
+
         return $this;
     }
 
@@ -258,6 +272,7 @@ class Game
         if ($this->comments->removeElement($comment) && $comment->getGame() === $this) {
             $comment->setGame(null);
         }
+
         return $this;
     }
 
@@ -272,6 +287,7 @@ class Game
             $this->likes->add($like);
             $like->setGame($this);
         }
+
         return $this;
     }
 
@@ -280,6 +296,7 @@ class Game
         if ($this->likes->removeElement($like) && $like->getGame() === $this) {
             $like->setGame(null);
         }
+
         return $this;
     }
 }

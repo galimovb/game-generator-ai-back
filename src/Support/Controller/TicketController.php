@@ -21,13 +21,14 @@ class TicketController extends AbstractController
 {
     public function __construct(
         private readonly TicketService $ticketService,
-        private readonly ApiResponse $apiResponse
-    ) {}
+        private readonly ApiResponse $apiResponse,
+    ) {
+    }
 
     #[Route('', name: 'create', methods: ['POST'])]
     public function create(
         #[MapRequestPayload] CreateTicketRequest $request,
-        #[CurrentUser] User $user
+        #[CurrentUser] User $user,
     ): JsonResponse {
         $ticket = $this->ticketService->createTicket($request, $user);
 
@@ -40,7 +41,7 @@ class TicketController extends AbstractController
     #[Route('', name: 'list', methods: ['GET'])]
     public function getList(
         Request $request,
-        #[CurrentUser] User $user
+        #[CurrentUser] User $user,
     ): JsonResponse {
         $page = $request->query->getInt('page', 1);
         $limit = $request->query->getInt('limit', 20);
@@ -51,21 +52,21 @@ class TicketController extends AbstractController
 
         return $this->apiResponse->success([
             'items' => array_map(
-                fn($ticket) => TicketResponse::fromEntity($ticket),
+                fn ($ticket) => TicketResponse::fromEntity($ticket),
                 $result['items']
             ),
             'pagination' => [
                 'page' => $page,
                 'limit' => $limit,
-                'total' => $result['total']
-            ]
+                'total' => $result['total'],
+            ],
         ]);
     }
 
     #[Route('/{id}', name: 'get', methods: ['GET'])]
     public function get(
         int $id,
-        #[CurrentUser] User $user
+        #[CurrentUser] User $user,
     ): JsonResponse {
         $ticket = $this->ticketService->getTicket($id, $user);
 
@@ -77,7 +78,7 @@ class TicketController extends AbstractController
     #[Route('/{id}/take', name: 'take', methods: ['POST'])]
     public function take(
         int $id,
-        #[CurrentUser] User $user
+        #[CurrentUser] User $user,
     ): JsonResponse {
         $ticket = $this->ticketService->takeTicket($id, $user);
 
@@ -90,7 +91,7 @@ class TicketController extends AbstractController
     public function changeStatus(
         int $id,
         #[MapRequestPayload] ChangeTicketStatusRequest $request,
-        #[CurrentUser] User $user
+        #[CurrentUser] User $user,
     ): JsonResponse {
         $ticket = $this->ticketService->changeStatus($id, $request, $user);
 
@@ -103,7 +104,7 @@ class TicketController extends AbstractController
     public function changePriority(
         int $id,
         #[MapRequestPayload] ChangeTicketPriorityRequest $request,
-        #[CurrentUser] User $user
+        #[CurrentUser] User $user,
     ): JsonResponse {
         $ticket = $this->ticketService->changePriority($id, $request, $user);
 
@@ -115,7 +116,7 @@ class TicketController extends AbstractController
     #[Route('/{id}/close', name: 'close', methods: ['POST'])]
     public function close(
         int $id,
-        #[CurrentUser] User $user
+        #[CurrentUser] User $user,
     ): JsonResponse {
         $ticket = $this->ticketService->closeTicket($id, $user);
 

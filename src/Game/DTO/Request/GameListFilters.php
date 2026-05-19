@@ -15,5 +15,6 @@ class GameListFilters
         public ?int $maxPlayers = null,
         public string $sortBy = 'createdAt',
         public string $sortOrder = 'DESC',
-    ) {}
+    ) {
+    }
 }

@@ -12,6 +12,7 @@ readonly class CreateCommentRequest
         public string $text,
 
         #[Assert\Positive]
-        public ?int $parentId = null
-    ) {}
+        public ?int $parentId = null,
+    ) {
+    }
 }

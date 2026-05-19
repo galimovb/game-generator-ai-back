@@ -16,8 +16,9 @@ class GameCommentService
     public function __construct(
         private readonly GameService $gameService,
         private readonly GameCommentRepository $commentRepository,
-        private readonly EntityManagerInterface $em
-    ) {}
+        private readonly EntityManagerInterface $em,
+    ) {
+    }
 
     /**
      * @throws \Exception
@@ -37,7 +38,7 @@ class GameCommentService
 
         return [
             'items' => $items,
-            'total' => $total
+            'total' => $total,
         ];
     }
 
@@ -57,9 +58,7 @@ class GameCommentService
             $parent = $this->findCommentOrFail($request->parentId);
 
             if ($parent->getGame()->getId() !== $gameId) {
-                throw new ApiException(
-                    ErrorCode::FORBIDDEN,
-                );
+                throw new ApiException(ErrorCode::FORBIDDEN);
             }
 
             $comment->setParent($parent);

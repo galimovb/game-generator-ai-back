@@ -12,7 +12,7 @@ enum TicketStatus: string
 
     public function getLabel(): string
     {
-        return match($this) {
+        return match ($this) {
             self::OPEN => 'Открыт',
             self::IN_PROGRESS => 'В обработке',
             self::WAITING_FOR_USER => 'Ожидает ответа пользователя',
@@ -23,6 +23,6 @@ enum TicketStatus: string
 
     public static function values(): array
     {
-        return array_map(fn(self $case) => $case->value, self::cases());
+        return array_map(fn (self $case) => $case->value, self::cases());
     }
 }
