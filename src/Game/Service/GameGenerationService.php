@@ -23,6 +23,14 @@ class GameGenerationService
 {
     private const MAX_JUDGE_RETRIES = 2;
 
+    private const MAX_CLOUD_RETRIES = 2;
+    private const EXAMPLE_COUNTS = 5;
+
+    private const GAME_EXAMPLES_PATH = __DIR__.'/../games/base.json';
+
+    private const CLOUD_TIMEOUT = 120;
+    private const OLLAMA_TIMEOUT = 180;
+
     public function __construct(
         private readonly HttpClientInterface $httpClient,
         private readonly EntityManagerInterface $entityManager,
@@ -47,7 +55,7 @@ class GameGenerationService
         $lastJudgeResult = null;
 
         for ($attempt = 1; $attempt <= self::MAX_JUDGE_RETRIES; ++$attempt) {
-            $aiData = $this->callAI($request, $request->photos, $model, $creative, judgeFailReason: $judgeFailReason);
+            $aiData = $this->callAI($request, $request->photos, $model, $creative, $judgeFailReason);
             $judgeResult = $this->judgeService->evaluate($aiData, $request, $request->photos);
             $lastJudgeResult = $judgeResult;
 
@@ -62,15 +70,6 @@ class GameGenerationService
                 $judgeResult->failReason,
                 !empty($judgeResult->safetyIssues) ? 'Проблемы безопасности: '.implode('; ', $judgeResult->safetyIssues) : null,
             ]));
-
-            $this->logger->warning('Judge rejected game, retrying', [
-                'attempt' => $attempt,
-                'max' => self::MAX_JUDGE_RETRIES,
-                'is_safe' => $judgeResult->isSafe,
-                'score' => $judgeResult->score,
-                'safety_issues' => $judgeResult->safetyIssues,
-                'fail_reason' => $judgeResult->failReason,
-            ]);
         }
 
         throw new ApiException((false === $lastJudgeResult?->isSafe) ? ErrorCode::SAFETY_CHECK_FAILED : ErrorCode::GENERATION_FAILED);
@@ -92,7 +91,7 @@ class GameGenerationService
         return $savedPaths;
     }
 
-    private function callAI(GenerateGameRequest $request, array $requestPhotos, string $model, float $creative, int $retryCount = 2, ?string $judgeFailReason = null): array
+    private function callAI(GenerateGameRequest $request, array $requestPhotos, string $model, float $creative, ?string $judgeFailReason = null): array
     {
         $prompt = $this->buildPrompt($request, $judgeFailReason);
         $userContent = [
@@ -105,20 +104,6 @@ class GameGenerationService
                 'image_url' => ['url' => $photoBase64],
             ];
         }
-
-        $this->logger->info('AI Generation Request', [
-            'age' => $request->age,
-            'players' => $request->players,
-            'duration' => $request->duration,
-            'locationType' => $request->locationType,
-            'fieldWidth' => $request->fieldWidth,
-            'fieldLength' => $request->fieldLength,
-            'activityLevel' => $request->activityLevel,
-            'model' => $model,
-            'creative' => $creative,
-            'photos_count' => count($requestPhotos),
-            'has_location_description' => !empty($request->locationDescription),
-        ]);
 
         $messages = [
             [
@@ -139,34 +124,27 @@ class GameGenerationService
             'response_format' => ['type' => 'json_object'],
         ];
 
-        for ($attempt = 1; $attempt <= $retryCount; ++$attempt) {
+        for ($attempt = 1; $attempt <= self::MAX_CLOUD_RETRIES; ++$attempt) {
             try {
-                $result = $this->sendCloudRequest($payload, $attempt);
+                $result = $this->sendCloudRequest($payload);
                 $this->validateAiResponse($result);
 
                 return $result;
             } catch (ApiException $e) {
                 $this->logger->warning('AI response validation failed, attempt '.$attempt);
-                if ($attempt === $retryCount) {
+                if (self::MAX_CLOUD_RETRIES === $attempt) {
                     throw $e;
                 }
             } catch (\Exception $e) {
                 $this->logger->error('AI request failed, attempt '.$attempt, [
                     'error' => $e->getMessage(),
                 ]);
-                if ($attempt === $retryCount) {
+                if (self::MAX_CLOUD_RETRIES === $attempt) {
                     $this->logger->info('Switching to Ollama fallback');
-                    try {
-                        $result = $this->sendOllamaRequest($payload);
-                        $this->validateAiResponse($result);
+                    $result = $this->sendOllamaRequest($payload);
+                    $this->validateAiResponse($result);
 
-                        return $result;
-                    } catch (\Exception $ollamaEx) {
-                        $this->logger->error('Ollama fallback failed', [
-                            'error' => $ollamaEx->getMessage(),
-                        ]);
-                        throw new ApiException(ErrorCode::GENERATION_FAILED);
-                    }
+                    return $result;
                 }
             }
         }
@@ -174,84 +152,45 @@ class GameGenerationService
         throw new ApiException(ErrorCode::GENERATION_FAILED);
     }
 
-    private function sendCloudRequest(array $payload, int $attempt): array
+    private function sendRequest(string $url, array $payload, array $headers, int $timeout): array
     {
-        $response = $this->httpClient->request('POST', $this->aiApiUrl.'/chat/completions', [
-            'headers' => [
-                'Authorization' => 'Bearer '.$this->aiApiKey,
-                'Content-Type' => 'application/json',
-            ],
+        $response = $this->httpClient->request('POST', $url, [
+            'headers' => $headers,
             'json' => $payload,
-            'timeout' => 120,
+            'timeout' => $timeout,
         ]);
-
-        $statusCode = $response->getStatusCode();
-
-        if ($statusCode >= 500) {
-            $this->logger->error('Cloud AI returned server error', [
-                'attempt' => $attempt,
-                'status_code' => $statusCode,
-            ]);
-            throw new \RuntimeException('Cloud AI server error: HTTP '.$statusCode);
-        }
 
         $data = $response->toArray();
         $content = $data['choices'][0]['message']['content'] ?? '{}';
-
-        $this->logger->info('Cloud AI Response', [
-            'attempt' => $attempt,
-            'content_length' => strlen($content),
-            'content_preview' => substr($content, 0, 500),
-        ]);
-
         $result = json_decode($content, true);
 
         if (JSON_ERROR_NONE !== json_last_error()) {
-            $this->logger->warning('Invalid JSON from cloud AI, attempt '.$attempt);
             throw new ApiException(ErrorCode::GENERATION_FAILED);
         }
 
         return $result;
     }
 
+    private function sendCloudRequest(array $payload): array
+    {
+        return $this->sendRequest(
+            $this->aiApiUrl.'/chat/completions',
+            $payload,
+            ['Authorization' => 'Bearer '.$this->aiApiKey, 'Content-Type' => 'application/json'],
+            self::CLOUD_TIMEOUT
+        );
+    }
+
     private function sendOllamaRequest(array $payload): array
     {
-        $fallbackModel = ModelType::fallbackModel();
-        $payload['model'] = $fallbackModel;
+        $payload['model'] = ModelType::fallbackModel();
 
-        $this->logger->info('Sending request to Ollama', [
-            'model' => $fallbackModel,
-        ]);
-
-        $response = $this->httpClient->request('POST', $this->ollamaApiUrl.'/api/chat/completions', [
-            'headers' => [
-                'Content-Type' => 'application/json',
-            ],
-            'json' => $payload,
-            'timeout' => 180,
-        ]);
-
-        $statusCode = $response->getStatusCode();
-
-        if ($statusCode >= 400) {
-            throw new \RuntimeException('Ollama returned error: HTTP '.$statusCode);
-        }
-
-        $data = $response->toArray();
-        $content = $data['choices'][0]['message']['content'] ?? '{}';
-
-        $this->logger->info('Ollama Response', [
-            'content_length' => strlen($content),
-            'content_preview' => substr($content, 0, 500),
-        ]);
-
-        $result = json_decode($content, true);
-
-        if (JSON_ERROR_NONE !== json_last_error()) {
-            throw new ApiException(ErrorCode::GENERATION_FAILED);
-        }
-
-        return $result;
+        return $this->sendRequest(
+            $this->ollamaApiUrl.'/api/chat/completions',
+            $payload,
+            ['Content-Type' => 'application/json'],
+            self::OLLAMA_TIMEOUT
+        );
     }
 
     private function buildSystemPrompt(GenerateGameRequest $request): string
@@ -359,13 +298,11 @@ PROMPT;
 
     private function getRandomExamples(): array
     {
-        $path = __DIR__.'/../train/base.json';
-
-        if (!file_exists($path)) {
+        if (!file_exists(self::GAME_EXAMPLES_PATH)) {
             return [];
         }
 
-        $content = file_get_contents($path);
+        $content = file_get_contents(self::GAME_EXAMPLES_PATH);
         $games = json_decode($content, true);
 
         if (!is_array($games) || empty($games)) {
@@ -374,7 +311,7 @@ PROMPT;
 
         shuffle($games);
 
-        return array_slice($games, 0, 5);
+        return array_slice($games, 0, self::EXAMPLE_COUNTS);
     }
 
     private function validateAiResponse(array $aiData): void
