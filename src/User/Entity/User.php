@@ -36,19 +36,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $login = null;
 
     #[ORM\Column]
-    private bool $isActive = true;
-
-    #[ORM\Column]
     private array $roles = ['ROLE_USER'];
 
     #[ORM\Column(nullable: true)]
     private ?string $avatar = null;
-
-    #[ORM\Column]
-    private bool $isBlocked = false;
-
-    #[ORM\Column]
-    private bool $isVerified = false;
 
     #[ORM\Column(length: 255)]
     private ?string $password = null;
@@ -150,18 +141,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function isActive(): bool
-    {
-        return $this->isActive;
-    }
-
-    public function setIsActive(bool $isActive): static
-    {
-        $this->isActive = $isActive;
-
-        return $this;
-    }
-
     public function getRoles(): array
     {
         return $this->roles;
@@ -182,30 +161,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setAvatar(string $avatar): static
     {
         $this->avatar = $avatar;
-
-        return $this;
-    }
-
-    public function isBlocked(): bool
-    {
-        return $this->isBlocked;
-    }
-
-    public function setIsBlocked(bool $isBlocked): static
-    {
-        $this->isBlocked = $isBlocked;
-
-        return $this;
-    }
-
-    public function isVerified(): bool
-    {
-        return $this->isVerified;
-    }
-
-    public function setIsVerified(bool $isVerified): static
-    {
-        $this->isVerified = $isVerified;
 
         return $this;
     }

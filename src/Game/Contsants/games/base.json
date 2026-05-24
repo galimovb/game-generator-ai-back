@@ -2,13 +2,16 @@
   {
     "title": "Вышибалы",
     "description": "Два водящих с двух сторон кидают мяч в игроков в центре. Кого задели — выходит. Кто поймал мяч («свеча») — может вернуть выбитого или получить дополнительную жизнь.",
-    "minAge": 7,
-    "maxAge": 12,
-    "minPlayers": 6,
-    "maxPlayers": 20,
+    "age": 10,
+    "players": 13,
     "duration": 15,
-    "locationType": "stadium",
+    "locationType": "outdoor",
+    "fieldWidth": null,
+    "fieldLength": null,
+    "activityLevel": "high",
+    "photos": null,
     "requisites": ["мяч"],
+    "isPublic": false,
     "stages": [
       {
         "title": "Вышибалы",
@@ -16,20 +19,24 @@
         "duration": 15,
         "tasks": ["Увернуться от мяча", "Поймать свечу", "Метко кинуть мяч"],
         "props": ["мяч"],
-        "stage_goal": "Остаться последним невыбитым"
+        "goal": "Остаться последним невыбитым",
+        "orderNum": 1
       }
     ]
   },
   {
     "title": "Казаки-разбойники",
     "description": "Команда разбойников убегает и прячется, оставляя стрелки-указатели. Казаки идут по следам и ловят разбойников. Пойманные отводятся в штаб.",
-    "minAge": 8,
-    "maxAge": 12,
-    "minPlayers": 8,
-    "maxPlayers": 20,
+    "age": 10,
+    "players": 14,
     "duration": 30,
-    "locationType": "park",
+    "locationType": "outdoor",
+    "fieldWidth": null,
+    "fieldLength": null,
+    "activityLevel": "high",
+    "photos": null,
     "requisites": ["мел"],
+    "isPublic": false,
     "stages": [
       {
         "title": "Побег разбойников",
@@ -37,7 +44,8 @@
         "duration": 5,
         "tasks": ["Быстро бежать", "Рисовать стрелки", "Спрятаться"],
         "props": ["мел"],
-        "stage_goal": "Сбить казаков со следа"
+        "goal": "Сбить казаков со следа",
+        "orderNum": 1
       },
       {
         "title": "Поиск казаков",
@@ -45,20 +53,24 @@
         "duration": 25,
         "tasks": ["Следовать стрелкам", "Найти разбойников", "Отвести в тюрьму"],
         "props": [],
-        "stage_goal": "Поймать всех разбойников"
+        "goal": "Поймать всех разбойников",
+        "orderNum": 2
       }
     ]
   },
   {
     "title": "Чай-чай-выручай",
     "description": "Водящий ловит игроков. Тот, кого осалили, останавливается, расставляет ноги и кричит: «Чай-чай-выручай!» Другой игрок может проползти между ног и освободить его.",
-    "minAge": 5,
-    "maxAge": 9,
-    "minPlayers": 5,
-    "maxPlayers": 15,
+    "age": 7,
+    "players": 10,
     "duration": 10,
-    "locationType": "park",
+    "locationType": "outdoor",
+    "fieldWidth": null,
+    "fieldLength": null,
+    "activityLevel": "high",
+    "photos": null,
     "requisites": [],
+    "isPublic": false,
     "stages": [
       {
         "title": "Ловля",
@@ -66,7 +78,8 @@
         "duration": 5,
         "tasks": ["Убегать от водящего", "Замереть с расставленными ногами", "Громко крикнуть"],
         "props": [],
-        "stage_goal": "Дождаться освобождения"
+        "goal": "Дождаться освобождения",
+        "orderNum": 1
       },
       {
         "title": "Выручай",
@@ -74,20 +87,24 @@
         "duration": 5,
         "tasks": ["Проползти под ногами", "Крикнуть выручай", "Не попасться водящему"],
         "props": [],
-        "stage_goal": "Освободить всех заколдованных"
+        "goal": "Освободить всех заколдованных",
+        "orderNum": 2
       }
     ]
   },
   {
     "title": "Съедобное-несъедобное",
     "description": "Ведущий кидает мяч игроку и называет предмет. Если съедобное — игрок ловит мяч, если несъедобное — отбивает.",
-    "minAge": 4,
-    "maxAge": 8,
-    "minPlayers": 3,
-    "maxPlayers": 10,
+    "age": 6,
+    "players": 7,
     "duration": 10,
-    "locationType": "park",
+    "locationType": "outdoor",
+    "fieldWidth": null,
+    "fieldLength": null,
+    "activityLevel": "low",
+    "photos": null,
     "requisites": ["мяч"],
+    "isPublic": false,
     "stages": [
       {
         "title": "Игра",
@@ -95,20 +112,24 @@
         "duration": 10,
         "tasks": ["Ловить съедобное", "Отбивать несъедобное", "Не ошибаться"],
         "props": ["мяч"],
-        "stage_goal": "Набрать меньше всех штрафных очков"
+        "goal": "Набрать меньше всех штрафных очков",
+        "orderNum": 1
       }
     ]
   },
   {
     "title": "Море волнуется",
     "description": "Ведущий произносит считалку, игроки двигаются, изображая морские волны. После слова «замри» все замирают в позах морских обитателей. Ведущий угадывает фигуры.",
-    "minAge": 5,
-    "maxAge": 10,
-    "minPlayers": 4,
-    "maxPlayers": 15,
+    "age": 8,
+    "players": 10,
     "duration": 8,
-    "locationType": "park",
+    "locationType": "outdoor",
+    "fieldWidth": null,
+    "fieldLength": null,
+    "activityLevel": "medium",
+    "photos": null,
     "requisites": [],
+    "isPublic": false,
     "stages": [
       {
         "title": "Волны",
@@ -116,7 +137,8 @@
         "duration": 3,
         "tasks": ["Двигаться плавно", "Имитировать волны", "Не останавливаться до сигнала"],
         "props": [],
-        "stage_goal": "Плавно двигаться"
+        "goal": "Плавно двигаться",
+        "orderNum": 1
       },
       {
         "title": "Замри",
@@ -124,20 +146,24 @@
         "duration": 5,
         "tasks": ["Замереть неподвижно", "Изобразить узнаваемую фигуру", "Не шевелиться и не смеяться"],
         "props": [],
-        "stage_goal": "Остаться последним"
+        "goal": "Остаться последним",
+        "orderNum": 2
       }
     ]
   },
   {
     "title": "Цепи кованые",
     "description": "Две команды стоят в шеренгах лицом друг к другу, крепко держась за руки. Выбранный игрок разбегается и пытается разорвать цепь соперников.",
-    "minAge": 8,
-    "maxAge": 12,
-    "minPlayers": 10,
-    "maxPlayers": 20,
+    "age": 10,
+    "players": 15,
     "duration": 15,
-    "locationType": "park",
+    "locationType": "outdoor",
+    "fieldWidth": null,
+    "fieldLength": null,
+    "activityLevel": "high",
+    "photos": null,
     "requisites": [],
+    "isPublic": false,
     "stages": [
       {
         "title": "Игра",
@@ -145,20 +171,24 @@
         "duration": 15,
         "tasks": ["Крепко держаться за руки", "Разорвать цепь соперника", "Удержать цепь при ударе"],
         "props": [],
-        "stage_goal": "Перетянуть всех игроков в свою команду"
+        "goal": "Перетянуть всех игроков в свою команду",
+        "orderNum": 1
       }
     ]
   },
   {
     "title": "Светофор",
     "description": "Водящий стоит спиной к игрокам. На «Зелёный свет» игроки бегут вперёд, на «Красный свет» — замирают. Пошевелившиеся возвращаются на старт.",
-    "minAge": 5,
-    "maxAge": 9,
-    "minPlayers": 4,
-    "maxPlayers": 15,
+    "age": 7,
+    "players": 10,
     "duration": 10,
-    "locationType": "park",
+    "locationType": "outdoor",
+    "fieldWidth": null,
+    "fieldLength": null,
+    "activityLevel": "high",
+    "photos": null,
     "requisites": [],
+    "isPublic": false,
     "stages": [
       {
         "title": "Игра",
@@ -166,20 +196,24 @@
         "duration": 10,
         "tasks": ["Бежать на зелёный свет", "Замереть на красный свет", "Коснуться водящего первым"],
         "props": [],
-        "stage_goal": "Добраться до водящего"
+        "goal": "Добраться до водящего",
+        "orderNum": 1
       }
     ]
   },
   {
     "title": "Саймон говорит",
     "description": "Ведущий даёт команды. Если команда начинается с «Саймон говорит» — все выполняют. Если нет — те, кто выполнил, выбывают.",
-    "minAge": 5,
-    "maxAge": 10,
-    "minPlayers": 3,
-    "maxPlayers": 15,
+    "age": 8,
+    "players": 9,
     "duration": 10,
-    "locationType": "park",
+    "locationType": "outdoor",
+    "fieldWidth": null,
+    "fieldLength": null,
+    "activityLevel": "low",
+    "photos": null,
     "requisites": [],
+    "isPublic": false,
     "stages": [
       {
         "title": "Игра",
@@ -187,20 +221,24 @@
         "duration": 10,
         "tasks": ["Слушать команду", "Выполнять только с «Саймон говорит»", "Не ошибаться"],
         "props": [],
-        "stage_goal": "Остаться последним"
+        "goal": "Остаться последним",
+        "orderNum": 1
       }
     ]
   },
   {
     "title": "Колечко",
     "description": "Игроки сидят в ряд. Ведущий незаметно передаёт одному игроку колечко, затем говорит: «Колечко-колечко, выйди на крылечко!» Игрок с колечком должен выскочить, а соседи — удержать.",
-    "minAge": 6,
-    "maxAge": 10,
-    "minPlayers": 5,
-    "maxPlayers": 15,
+    "age": 8,
+    "players": 10,
     "duration": 10,
-    "locationType": "park",
+    "locationType": "outdoor",
+    "fieldWidth": null,
+    "fieldLength": null,
+    "activityLevel": "low",
+    "photos": null,
     "requisites": ["кольцо", "монета"],
+    "isPublic": false,
     "stages": [
       {
         "title": "Передача",
@@ -208,7 +246,8 @@
         "duration": 5,
         "tasks": ["Сложить руки лодочкой", "Не подглядывать", "Не показывать эмоции"],
         "props": ["кольцо"],
-        "stage_goal": "Остаться незамеченным"
+        "goal": "Остаться незамеченным",
+        "orderNum": 1
       },
       {
         "title": "Крылечко",
@@ -216,20 +255,24 @@
         "duration": 5,
         "tasks": ["Резко встать", "Выбежать вперёд", "Поймать выбегающего"],
         "props": [],
-        "stage_goal": "Выбежать или поймать"
+        "goal": "Выбежать или поймать",
+        "orderNum": 2
       }
     ]
   },
   {
     "title": "Чехарда",
     "description": "Игроки по очереди перепрыгивают через согнутых товарищей, стоящих в позе «согнувшись, уперев руки в колени».",
-    "minAge": 8,
-    "maxAge": 12,
-    "minPlayers": 4,
-    "maxPlayers": 10,
+    "age": 10,
+    "players": 7,
     "duration": 10,
-    "locationType": "park",
+    "locationType": "outdoor",
+    "fieldWidth": null,
+    "fieldLength": null,
+    "activityLevel": "high",
+    "photos": null,
     "requisites": [],
+    "isPublic": false,
     "stages": [
       {
         "title": "Чехарда",
@@ -237,20 +280,24 @@
         "duration": 10,
         "tasks": ["Разбежаться и перепрыгнуть", "Опираться руками о спину", "Не задеть прыгающего"],
         "props": [],
-        "stage_goal": "Пройти всю цепочку без ошибок"
+        "goal": "Пройти всю цепочку без ошибок",
+        "orderNum": 1
       }
     ]
   },
   {
     "title": "Третий лишний",
     "description": "Водящий догоняет убегающего. Остальные стоят парами по кругу. Убегающий может встать в любую пару, тогда третий становится новым убегающим.",
-    "minAge": 7,
-    "maxAge": 11,
-    "minPlayers": 7,
-    "maxPlayers": 15,
+    "age": 9,
+    "players": 11,
     "duration": 12,
-    "locationType": "park",
+    "locationType": "outdoor",
+    "fieldWidth": null,
+    "fieldLength": null,
+    "activityLevel": "high",
+    "photos": null,
     "requisites": [],
+    "isPublic": false,
     "stages": [
       {
         "title": "Игра",
@@ -258,20 +305,24 @@
         "duration": 12,
         "tasks": ["Убегать от водящего", "Встать в пару", "Поймать убегающего"],
         "props": [],
-        "stage_goal": "Не быть пойманным или поймать"
+        "goal": "Не быть пойманным или поймать",
+        "orderNum": 1
       }
     ]
   },
   {
     "title": "Горячая картошка",
     "description": "Игроки в кругу быстро перебрасывают мяч друг другу, стараясь не держать его в руках дольше 2-3 секунд. Тот, кто задержал, выбывает.",
-    "minAge": 6,
-    "maxAge": 10,
-    "minPlayers": 5,
-    "maxPlayers": 12,
+    "age": 8,
+    "players": 9,
     "duration": 8,
-    "locationType": "park",
+    "locationType": "outdoor",
+    "fieldWidth": null,
+    "fieldLength": null,
+    "activityLevel": "high",
+    "photos": null,
     "requisites": ["мяч"],
+    "isPublic": false,
     "stages": [
       {
         "title": "Игра",
@@ -279,20 +330,24 @@
         "duration": 8,
         "tasks": ["Быстро перебрасывать мяч", "Не держать дольше 2 секунд", "Не уронить мяч"],
         "props": ["мяч"],
-        "stage_goal": "Остаться последним"
+        "goal": "Остаться последним",
+        "orderNum": 1
       }
     ]
   },
   {
     "title": "Ручеёк",
     "description": "Игроки встают парами друг за другом, поднимая сцепленные руки вверх. Водящий проходит под руками, выбирает пару и встаёт в начало. Оставшийся игрок становится новым водящим.",
-    "minAge": 5,
-    "maxAge": 9,
-    "minPlayers": 7,
-    "maxPlayers": 15,
+    "age": 7,
+    "players": 11,
     "duration": 8,
-    "locationType": "park",
+    "locationType": "outdoor",
+    "fieldWidth": null,
+    "fieldLength": null,
+    "activityLevel": "medium",
+    "photos": null,
     "requisites": [],
+    "isPublic": false,
     "stages": [
       {
         "title": "Ручеёк",
@@ -300,20 +355,24 @@
         "duration": 8,
         "tasks": ["Поднять сцепленные руки вверх", "Пройти под воротиками", "Быстро встать в пару"],
         "props": [],
-        "stage_goal": "Не остаться без пары"
+        "goal": "Не остаться без пары",
+        "orderNum": 1
       }
     ]
   },
   {
     "title": "Глухой телефон",
     "description": "Игроки передают слово или фразу шёпотом по цепочке. Последний игрок произносит услышанное вслух. То, что получилось, сравнивается с оригиналом.",
-    "minAge": 6,
-    "maxAge": 10,
-    "minPlayers": 5,
-    "maxPlayers": 12,
+    "age": 8,
+    "players": 9,
     "duration": 8,
-    "locationType": "park",
+    "locationType": "outdoor",
+    "fieldWidth": null,
+    "fieldLength": null,
+    "activityLevel": "low",
+    "photos": null,
     "requisites": [],
+    "isPublic": false,
     "stages": [
       {
         "title": "Игра",
@@ -321,20 +380,24 @@
         "duration": 8,
         "tasks": ["Шёпотом передать слово", "Не переспрашивать", "Запомнить услышанное"],
         "props": [],
-        "stage_goal": "Передать слово без искажений"
+        "goal": "Передать слово без искажений",
+        "orderNum": 1
       }
     ]
   },
   {
     "title": "Испорченный телефон с действиями",
     "description": "Первый игрок показывает движение, второй повторяет и добавляет своё. Цепочка растёт, последний должен повторить всю последовательность.",
-    "minAge": 7,
-    "maxAge": 11,
-    "minPlayers": 5,
-    "maxPlayers": 12,
+    "age": 9,
+    "players": 9,
     "duration": 10,
-    "locationType": "park",
+    "locationType": "outdoor",
+    "fieldWidth": null,
+    "fieldLength": null,
+    "activityLevel": "low",
+    "photos": null,
     "requisites": [],
+    "isPublic": false,
     "stages": [
       {
         "title": "Игра",
@@ -342,20 +405,24 @@
         "duration": 10,
         "tasks": ["Запомнить движения", "Повторить всю цепочку", "Добавить новое движение"],
         "props": [],
-        "stage_goal": "Повторить всю последовательность движений без ошибок"
+        "goal": "Повторить всю последовательность движений без ошибок",
+        "orderNum": 1
       }
     ]
   },
   {
     "title": "Шляпа",
     "description": "Дети передают шляпу по кругу, произнося стишок. После окончания стишка тот, у кого шляпа, догоняет остальных и надевает шляпу на другого. Пойманный становится новым ловцом.",
-    "minAge": 4,
-    "maxAge": 7,
-    "minPlayers": 5,
-    "maxPlayers": 15,
+    "age": 6,
+    "players": 10,
     "duration": 10,
     "locationType": "both",
+    "fieldWidth": null,
+    "fieldLength": null,
+    "activityLevel": "high",
+    "photos": null,
     "requisites": ["шляпа"],
+    "isPublic": false,
     "stages": [
       {
         "title": "Передача и ловля",
@@ -363,20 +430,24 @@
         "duration": 10,
         "tasks": ["Передавать шляпу по кругу", "Громко произносить стишок", "Бегать и уворачиваться", "Аккуратно надевать шляпу"],
         "props": ["шляпа"],
-        "stage_goal": "Не быть пойманным или поймать другого"
+        "goal": "Не быть пойманным или поймать другого",
+        "orderNum": 1
       }
     ]
   },
   {
     "title": "Петина горошина",
     "description": "Дети передают мячик («горошину») по кругу, произносят стишок. На последнем слове тот, у кого мяч, с закрытыми глазами бросает его в сторону и кричит «Ищи!». Все ищут мяч. Кто нашёл — победил.",
-    "minAge": 4,
-    "maxAge": 7,
-    "minPlayers": 5,
-    "maxPlayers": 12,
+    "age": 6,
+    "players": 9,
     "duration": 10,
     "locationType": "both",
+    "fieldWidth": null,
+    "fieldLength": null,
+    "activityLevel": "medium",
+    "photos": null,
     "requisites": ["мяч"],
+    "isPublic": false,
     "stages": [
       {
         "title": "Передача и поиск",
@@ -384,20 +455,24 @@
         "duration": 10,
         "tasks": ["Передавать мяч по кругу", "Закрыть глаза по сигналу", "Бросить мяч в сторону", "Найти мяч быстрее всех"],
         "props": ["мяч"],
-        "stage_goal": "Первым найти горошину"
+        "goal": "Первым найти горошину",
+        "orderNum": 1
       }
     ]
   },
   {
     "title": "Палочки-передавалочки",
     "description": "Дети стоят в кругу, каждый держит палочку. У двоих детей на палочках наброшена салфетка. По команде они передают салфетку с палочки на палочку по кругу. У кого окажется две салфетки — выбывает. Побеждают 5 оставшихся.",
-    "minAge": 5,
-    "maxAge": 7,
-    "minPlayers": 7,
-    "maxPlayers": 15,
+    "age": 6,
+    "players": 11,
     "duration": 10,
     "locationType": "indoor",
+    "fieldWidth": null,
+    "fieldLength": null,
+    "activityLevel": "medium",
+    "photos": null,
     "requisites": ["палочки", "салфетки"],
+    "isPublic": false,
     "stages": [
       {
         "title": "Передача салфеток",
@@ -405,20 +480,24 @@
         "duration": 10,
         "tasks": ["Держать палочку на ладони", "Передавать салфетку на соседнюю палочку", "Не трогать салфетку руками", "Поднимать упавшую салфетку палочкой"],
         "props": ["палочки", "салфетки"],
-        "stage_goal": "Остаться в игре и не получить две салфетки"
+        "goal": "Остаться в игре и не получить две салфетки",
+        "orderNum": 1
       }
     ]
   },
   {
     "title": "Цепи",
     "description": "Две команды встают в линии, взявшись за руки. Одна команда подходит к другой со словами: «Цепи-цепи кованые, раскуйте нас!» Вторая спрашивает: «Кем из нас?» Выбранный игрок разбегается и пытается прорвать цепь.",
-    "minAge": 5,
-    "maxAge": 7,
-    "minPlayers": 8,
-    "maxPlayers": 20,
+    "age": 6,
+    "players": 14,
     "duration": 15,
     "locationType": "outdoor",
+    "fieldWidth": null,
+    "fieldLength": null,
+    "activityLevel": "high",
+    "photos": null,
     "requisites": [],
+    "isPublic": false,
     "stages": [
       {
         "title": "Прорыв цепи",
@@ -426,20 +505,24 @@
         "duration": 15,
         "tasks": ["Крепко держаться за руки", "Разбежаться и ударить по рукам", "Не разжимать руки до удара", "Забрать игрока или остаться в чужой команде"],
         "props": [],
-        "stage_goal": "Перетянуть всех игроков в свою команду"
+        "goal": "Перетянуть всех игроков в свою команду",
+        "orderNum": 1
       }
     ]
   },
   {
     "title": "У медведя во бору",
     "description": "Дети идут к «медведю» (спит в берлоге), имитируют сбор грибов. Приближаются, гладят, щекочут. На последних словах медведь просыпается и ловит детей. Пойманный становится медведем.",
-    "minAge": 4,
-    "maxAge": 7,
-    "minPlayers": 5,
-    "maxPlayers": 20,
+    "age": 6,
+    "players": 13,
     "duration": 10,
     "locationType": "both",
+    "fieldWidth": null,
+    "fieldLength": null,
+    "activityLevel": "high",
+    "photos": null,
     "requisites": [],
+    "isPublic": false,
     "stages": [
       {
         "title": "У медведя во бору",
@@ -447,20 +530,24 @@
         "duration": 10,
         "tasks": ["Подкрадываться к медведю", "Громко произносить стишок", "Гладить и щекотать медведя", "Убегать от медведя"],
         "props": [],
-        "stage_goal": "Не быть пойманным медведем"
+        "goal": "Не быть пойманным медведем",
+        "orderNum": 1
       }
     ]
   },
   {
     "title": "Официанты",
     "description": "Дети делятся на «официантов» и «голодных мух». Официанты держат на раскрытых ладонях по две пластиковые тарелки. Мухи стараются сбить тарелку, коснувшись ладошкой. Через 2-3 минуты роли меняются.",
-    "minAge": 4,
-    "maxAge": 7,
-    "minPlayers": 6,
-    "maxPlayers": 16,
+    "age": 6,
+    "players": 11,
     "duration": 8,
     "locationType": "both",
+    "fieldWidth": null,
+    "fieldLength": null,
+    "activityLevel": "high",
+    "photos": null,
     "requisites": ["пластиковые тарелки"],
+    "isPublic": false,
     "stages": [
       {
         "title": "Официанты и мухи",
@@ -468,20 +555,24 @@
         "duration": 8,
         "tasks": ["Держать тарелки на ладонях", "Сбивать тарелки у официантов", "Не толкаться", "Не держать тарелки за край"],
         "props": ["пластиковые тарелки"],
-        "stage_goal": "Удержать больше тарелок или сбить больше тарелок"
+        "goal": "Удержать больше тарелок или сбить больше тарелок",
+        "orderNum": 1
       }
     ]
   },
   {
     "title": "Совушка",
     "description": "Днём «совушка» спит в гнезде, а дети бегают и играют. Ночью совушка вылетает и ловит тех, кто пошевелился.",
-    "minAge": 4,
-    "maxAge": 7,
-    "minPlayers": 5,
-    "maxPlayers": 20,
+    "age": 6,
+    "players": 13,
     "duration": 10,
     "locationType": "both",
+    "fieldWidth": null,
+    "fieldLength": null,
+    "activityLevel": "medium",
+    "photos": null,
     "requisites": [],
+    "isPublic": false,
     "stages": [
       {
         "title": "День и ночь",
@@ -489,20 +580,24 @@
         "duration": 10,
         "tasks": ["Бегать днём", "Замирать ночью", "Не шевелиться, когда совушка смотрит"],
         "props": [],
-        "stage_goal": "Не попасться совушке"
+        "goal": "Не попасться совушке",
+        "orderNum": 1
       }
     ]
   },
   {
     "title": "Зайка серый умывается",
     "description": "Дети — зайки. Они выполняют движения в соответствии со словами стишка: моют лапки, ушки, хвостик, потом ищут морковку и скачут.",
-    "minAge": 3,
-    "maxAge": 5,
-    "minPlayers": 4,
-    "maxPlayers": 15,
+    "age": 4,
+    "players": 10,
     "duration": 6,
     "locationType": "both",
+    "fieldWidth": null,
+    "fieldLength": null,
+    "activityLevel": "low",
+    "photos": null,
     "requisites": [],
+    "isPublic": false,
     "stages": [
       {
         "title": "Зайкина зарядка",
@@ -510,20 +605,24 @@
         "duration": 6,
         "tasks": ["Повторять движения за ведущим", "Произносить стишок хором", "Прыгать и бегать на месте", "Изображать эмоции"],
         "props": [],
-        "stage_goal": "Правильно выполнять все движения"
+        "goal": "Правильно выполнять все движения",
+        "orderNum": 1
       }
     ]
   },
   {
     "title": "Пузырь",
     "description": "Дети идут по кругу, взявшись за руки, «надувают пузырь», а потом он «лопается».",
-    "minAge": 3,
-    "maxAge": 5,
-    "minPlayers": 5,
-    "maxPlayers": 20,
+    "age": 4,
+    "players": 13,
     "duration": 5,
     "locationType": "both",
+    "fieldWidth": null,
+    "fieldLength": null,
+    "activityLevel": "low",
+    "photos": null,
     "requisites": [],
+    "isPublic": false,
     "stages": [
       {
         "title": "Надуваем пузырь",
@@ -531,20 +630,24 @@
         "duration": 5,
         "tasks": ["Держаться за руки", "Расширять круг", "Не расцеплять руки до команды", "Приседать на слово «Хлоп!»"],
         "props": [],
-        "stage_goal": "Сделать самый большой пузырь до того, как он лопнет"
+        "goal": "Сделать самый большой пузырь до того, как он лопнет",
+        "orderNum": 1
       }
     ]
   },
   {
     "title": "Лохматый пёс",
     "description": "Дети подкрадываются к «псу», который сидит в будке. Дразнят его стишком. Пёс просыпается, лает и ловит детей.",
-    "minAge": 4,
-    "maxAge": 7,
-    "minPlayers": 5,
-    "maxPlayers": 15,
+    "age": 6,
+    "players": 10,
     "duration": 8,
     "locationType": "both",
+    "fieldWidth": null,
+    "fieldLength": null,
+    "activityLevel": "high",
+    "photos": null,
     "requisites": [],
+    "isPublic": false,
     "stages": [
       {
         "title": "Лохматый пёс",
@@ -552,20 +655,24 @@
         "duration": 8,
         "tasks": ["Подкрадываться к псу", "Громко произносить стишок", "Убегать от пса", "Не попадаться"],
         "props": [],
-        "stage_goal": "Не быть пойманным псом"
+        "goal": "Не быть пойманным псом",
+        "orderNum": 1
       }
     ]
   },
   {
     "title": "Мы весёлые ребята",
     "description": "Дети перебегают с одной стороны площадки на другую. Ловишка ловит тех, кто не успел перебежать.",
-    "minAge": 5,
-    "maxAge": 7,
-    "minPlayers": 6,
-    "maxPlayers": 20,
+    "age": 6,
+    "players": 13,
     "duration": 8,
     "locationType": "outdoor",
+    "fieldWidth": null,
+    "fieldLength": null,
+    "activityLevel": "high",
+    "photos": null,
     "requisites": [],
+    "isPublic": false,
     "stages": [
       {
         "title": "Перебежки",
@@ -573,20 +680,24 @@
         "duration": 8,
         "tasks": ["Перебегать с одной стороны на другую", "Уворачиваться от ловишки", "Громко произносить дразнилку"],
         "props": [],
-        "stage_goal": "Успеть перебежать и не быть пойманным"
+        "goal": "Успеть перебежать и не быть пойманным",
+        "orderNum": 1
       }
     ]
   },
   {
     "title": "День и ночь",
     "description": "По команде «День» дети бегают, по команде «Ночь» — замирают. Кто пошевелился — выбывает.",
-    "minAge": 5,
-    "maxAge": 7,
-    "minPlayers": 5,
-    "maxPlayers": 20,
+    "age": 6,
+    "players": 13,
     "duration": 8,
     "locationType": "both",
+    "fieldWidth": null,
+    "fieldLength": null,
+    "activityLevel": "medium",
+    "photos": null,
     "requisites": [],
+    "isPublic": false,
     "stages": [
       {
         "title": "День и ночь",
@@ -594,20 +705,24 @@
         "duration": 8,
         "tasks": ["Бегать по команде «День»", "Замирать по команде «Ночь»", "Не шевелиться, когда замерли"],
         "props": [],
-        "stage_goal": "Остаться последним невыбывшим игроком"
+        "goal": "Остаться последним невыбывшим игроком",
+        "orderNum": 1
       }
     ]
   },
   {
     "title": "Гуси-лебеди",
     "description": "Гуси пасутся в поле. Волк в логове. Хозяйка зовёт гусей домой, волк их ловит.",
-    "minAge": 5,
-    "maxAge": 7,
-    "minPlayers": 6,
-    "maxPlayers": 20,
+    "age": 6,
+    "players": 13,
     "duration": 10,
     "locationType": "outdoor",
+    "fieldWidth": null,
+    "fieldLength": null,
+    "activityLevel": "high",
+    "photos": null,
     "requisites": [],
+    "isPublic": false,
     "stages": [
       {
         "title": "Гуси-лебеди",
@@ -615,20 +730,24 @@
         "duration": 10,
         "tasks": ["Отвечать хозяйке хором", "Бежать в дом", "Не попасться волку"],
         "props": [],
-        "stage_goal": "Добежать до дома, не будучи пойманным волком"
+        "goal": "Добежать до дома, не будучи пойманным волком",
+        "orderNum": 1
       }
     ]
   },
   {
     "title": "Кот и воробьи",
     "description": "Кот спит в своём доме. Воробьи прыгают вокруг, клюют зёрна. Кот просыпается и ловит воробьёв.",
-    "minAge": 4,
-    "maxAge": 6,
-    "minPlayers": 5,
-    "maxPlayers": 15,
+    "age": 5,
+    "players": 10,
     "duration": 8,
     "locationType": "both",
+    "fieldWidth": null,
+    "fieldLength": null,
+    "activityLevel": "high",
+    "photos": null,
     "requisites": [],
+    "isPublic": false,
     "stages": [
       {
         "title": "Кот и воробьи",
@@ -636,20 +755,24 @@
         "duration": 8,
         "tasks": ["Прыгать на двух ногах", "Клевать зёрна", "Чирикать", "Убегать от кота"],
         "props": [],
-        "stage_goal": "Не быть пойманным котом"
+        "goal": "Не быть пойманным котом",
+        "orderNum": 1
       }
     ]
   },
   {
     "title": "Поймай комара",
     "description": "Воспитатель вращает над головами детей верёвку с «комаром». Дети подпрыгивают и хлопают — ловят комара.",
-    "minAge": 3,
-    "maxAge": 5,
-    "minPlayers": 4,
-    "maxPlayers": 10,
+    "age": 4,
+    "players": 7,
     "duration": 5,
     "locationType": "indoor",
+    "fieldWidth": null,
+    "fieldLength": null,
+    "activityLevel": "medium",
+    "photos": null,
     "requisites": ["верёвка с игрушкой"],
+    "isPublic": false,
     "stages": [
       {
         "title": "Ловим комара",
@@ -657,20 +780,24 @@
         "duration": 5,
         "tasks": ["Прыгать вверх", "Хлопать в ладоши", "Поймать комара"],
         "props": ["верёвка с игрушкой"],
-        "stage_goal": "Поймать комара как можно больше раз"
+        "goal": "Поймать комара как можно больше раз",
+        "orderNum": 1
       }
     ]
   },
   {
     "title": "Третий лишний",
     "description": "Дети бегают парами по кругу. Водящий догоняет убегающего. Тот может встать впереди любой пары — тогда третий («лишний») бежит.",
-    "minAge": 5,
-    "maxAge": 7,
-    "minPlayers": 7,
-    "maxPlayers": 15,
+    "age": 6,
+    "players": 11,
     "duration": 12,
     "locationType": "both",
+    "fieldWidth": null,
+    "fieldLength": null,
+    "activityLevel": "high",
+    "photos": null,
     "requisites": [],
+    "isPublic": false,
     "stages": [
       {
         "title": "Третий лишний",
@@ -678,20 +805,24 @@
         "duration": 12,
         "tasks": ["Убегать от ловишки", "Вставать перед парой", "Ловить убегающего"],
         "props": [],
-        "stage_goal": "Не быть пойманным или поймать убегающего"
+        "goal": "Не быть пойманным или поймать убегающего",
+        "orderNum": 1
       }
     ]
   },
   {
     "title": "Ровным кругом",
     "description": "Дети идут по кругу. Водящий в центре показывает движение. Все повторяют.",
-    "minAge": 4,
-    "maxAge": 7,
-    "minPlayers": 5,
-    "maxPlayers": 15,
+    "age": 6,
+    "players": 10,
     "duration": 6,
     "locationType": "both",
+    "fieldWidth": null,
+    "fieldLength": null,
+    "activityLevel": "low",
+    "photos": null,
     "requisites": [],
+    "isPublic": false,
     "stages": [
       {
         "title": "Ровным кругом",
@@ -699,20 +830,24 @@
         "duration": 6,
         "tasks": ["Идти по кругу", "Останавливаться по сигналу", "Повторять движения водящего"],
         "props": [],
-        "stage_goal": "Точно повторять движения водящего"
+        "goal": "Точно повторять движения водящего",
+        "orderNum": 1
       }
     ]
   },
   {
     "title": "Море волнуется раз",
     "description": "Дети бегают. На команду «Море волнуется — раз, два, три — морская фигура на месте замри!» все замирают в позах. Водящий угадывает, кто кого изображает.",
-    "minAge": 4,
-    "maxAge": 7,
-    "minPlayers": 4,
-    "maxPlayers": 15,
+    "age": 6,
+    "players": 10,
     "duration": 8,
     "locationType": "both",
+    "fieldWidth": null,
+    "fieldLength": null,
+    "activityLevel": "medium",
+    "photos": null,
     "requisites": [],
+    "isPublic": false,
     "stages": [
       {
         "title": "Море волнуется",
@@ -720,20 +855,24 @@
         "duration": 8,
         "tasks": ["Бегать до сигнала", "Замирать по команде", "Изображать морскую фигуру", "Не шевелиться"],
         "props": [],
-        "stage_goal": "Остаться последним незамеченным"
+        "goal": "Остаться последним незамеченным",
+        "orderNum": 1
       }
     ]
   },
   {
     "title": "Съедобное-несъедобное",
     "description": "Водящий бросает мяч и называет предмет. Если съедобное — надо поймать мяч. Если несъедобное — отбить.",
-    "minAge": 4,
-    "maxAge": 7,
-    "minPlayers": 3,
-    "maxPlayers": 10,
+    "age": 6,
+    "players": 7,
     "duration": 8,
     "locationType": "both",
+    "fieldWidth": null,
+    "fieldLength": null,
+    "activityLevel": "low",
+    "photos": null,
     "requisites": ["мяч"],
+    "isPublic": false,
     "stages": [
       {
         "title": "Съедобное-несъедобное",
@@ -741,20 +880,24 @@
         "duration": 8,
         "tasks": ["Ловить мяч на съедобное", "Отбивать мяч на несъедобное", "Быстро принимать решение"],
         "props": ["мяч"],
-        "stage_goal": "Ни разу не ошибиться"
+        "goal": "Ни разу не ошибиться",
+        "orderNum": 1
       }
     ]
   },
   {
     "title": "Вышибала",
     "description": "Один игрок с мячом («вышибала») старается осалить мячом остальных. Тот, кто поймал мяч, сам становится вышибалой. Игра идёт на счёт - побеждает тот, кто осалил больше всех.",
-    "minAge": 7,
-    "maxAge": 11,
-    "minPlayers": 5,
-    "maxPlayers": 20,
+    "age": 9,
+    "players": 13,
     "duration": 8,
     "locationType": "outdoor",
+    "fieldWidth": null,
+    "fieldLength": null,
+    "activityLevel": "high",
+    "photos": null,
     "requisites": ["мяч"],
+    "isPublic": false,
     "stages": [
       {
         "title": "Вышибала",
@@ -762,20 +905,24 @@
         "duration": 8,
         "tasks": ["Бросать мяч в игроков", "Уворачиваться от мяча", "Ловить мяч на лету", "Громко считать очки"],
         "props": ["мяч"],
-        "stage_goal": "Набрать больше всех очков"
+        "goal": "Набрать больше всех очков",
+        "orderNum": 1
       }
     ]
   },
   {
     "title": "Переправа",
     "description": "Две команды прыгают на одной ноге навстречу друг другу. Кто пришёл последним - выбывает. Так до тех пор, пока не останутся самые выносливые.",
-    "minAge": 7,
-    "maxAge": 11,
-    "minPlayers": 6,
-    "maxPlayers": 20,
+    "age": 9,
+    "players": 13,
     "duration": 8,
     "locationType": "outdoor",
+    "fieldWidth": null,
+    "fieldLength": null,
+    "activityLevel": "high",
+    "photos": null,
     "requisites": [],
+    "isPublic": false,
     "stages": [
       {
         "title": "Переправа",
@@ -783,20 +930,24 @@
         "duration": 8,
         "tasks": ["Прыгать на одной ноге", "Сохранять равновесие", "Не менять ногу"],
         "props": [],
-        "stage_goal": "Остаться самым выносливым"
+        "goal": "Остаться самым выносливым",
+        "orderNum": 1
       }
     ]
   },
   {
     "title": "Горелки",
     "description": "Играющие стоят в колонне парами. Водящий впереди. Последняя пара по сигналу бежит вперёд с двух сторон и старается соединить руки раньше, чем водящий поймает одного из них.",
-    "minAge": 7,
-    "maxAge": 11,
-    "minPlayers": 6,
-    "maxPlayers": 20,
+    "age": 9,
+    "players": 13,
     "duration": 8,
     "locationType": "outdoor",
+    "fieldWidth": null,
+    "fieldLength": null,
+    "activityLevel": "high",
+    "photos": null,
     "requisites": [],
+    "isPublic": false,
     "stages": [
       {
         "title": "Горелки",
@@ -804,20 +955,24 @@
         "duration": 8,
         "tasks": ["Бежать вдоль колонны", "Взяться за руки впереди водящего", "Не выбегать раньше сигнала"],
         "props": [],
-        "stage_goal": "Не быть пойманным водящим"
+        "goal": "Не быть пойманным водящим",
+        "orderNum": 1
       }
     ]
   },
   {
     "title": "Охотники и звери",
     "description": "Игроки делятся на «охотников» (образуют круг) и «зверей» (внутри круга). Охотники перебрасывают мяч друг другу и стараются попасть в ноги зверям. Подстреленные выходят.",
-    "minAge": 7,
-    "maxAge": 11,
-    "minPlayers": 8,
-    "maxPlayers": 24,
+    "age": 9,
+    "players": 16,
     "duration": 10,
     "locationType": "outdoor",
+    "fieldWidth": null,
+    "fieldLength": null,
+    "activityLevel": "high",
+    "photos": null,
     "requisites": ["мяч"],
+    "isPublic": false,
     "stages": [
       {
         "title": "Охота",
@@ -825,20 +980,24 @@
         "duration": 10,
         "tasks": ["Перебрасывать мяч", "Попасть в ноги зверям", "Увертываться от мяча", "Не выходить за круг"],
         "props": ["мяч"],
-        "stage_goal": "Быстрее всех подстрелить зверей или дольше продержаться"
+        "goal": "Быстрее всех подстрелить зверей или дольше продержаться",
+        "orderNum": 1
       }
     ]
   },
   {
     "title": "У медведя во бору",
     "description": "Дети имитируют сбор грибов и ягод в лесу, произносят стишок. Из берлоги выбегает «медведь» и ловит тех, кто не успел убежать.",
-    "minAge": 7,
-    "maxAge": 11,
-    "minPlayers": 4,
-    "maxPlayers": 20,
+    "age": 9,
+    "players": 12,
     "duration": 10,
     "locationType": "outdoor",
+    "fieldWidth": null,
+    "fieldLength": null,
+    "activityLevel": "high",
+    "photos": null,
     "requisites": [],
+    "isPublic": false,
     "stages": [
       {
         "title": "У медведя во бору",
@@ -846,20 +1005,24 @@
         "duration": 10,
         "tasks": ["Имитировать сбор грибов", "Произносить стишок", "Убегать от медведя", "Не попадаться"],
         "props": [],
-        "stage_goal": "Не быть пойманным медведем"
+        "goal": "Не быть пойманным медведем",
+        "orderNum": 1
       }
     ]
   },
   {
     "title": "Волки и овцы",
     "description": "Овцы пасутся на лугу, волки прячутся в овраге. По сигналу «Волки!» волки выбегают и ловят овец, уводя их в овраг.",
-    "minAge": 7,
-    "maxAge": 11,
-    "minPlayers": 8,
-    "maxPlayers": 20,
+    "age": 9,
+    "players": 14,
     "duration": 10,
     "locationType": "outdoor",
+    "fieldWidth": null,
+    "fieldLength": null,
+    "activityLevel": "high",
+    "photos": null,
     "requisites": [],
+    "isPublic": false,
     "stages": [
       {
         "title": "Волки и овцы",
@@ -867,20 +1030,24 @@
         "duration": 10,
         "tasks": ["Пастись на лугу", "Убегать от волков", "Ловить овец"],
         "props": [],
-        "stage_goal": "Не быть пойманным волком"
+        "goal": "Не быть пойманным волком",
+        "orderNum": 1
       }
     ]
   },
   {
     "title": "Капканы",
     "description": "6 игроков образуют три «капкана» (пары с поднятыми руками). Остальные, взявшись за руки цепочкой, проходят сквозь капканы. По сигналу капканы закрываются.",
-    "minAge": 7,
-    "maxAge": 11,
-    "minPlayers": 10,
-    "maxPlayers": 20,
+    "age": 9,
+    "players": 15,
     "duration": 8,
     "locationType": "indoor",
+    "fieldWidth": null,
+    "fieldLength": null,
+    "activityLevel": "medium",
+    "photos": null,
     "requisites": [],
+    "isPublic": false,
     "stages": [
       {
         "title": "Капканы",
@@ -888,20 +1055,24 @@
         "duration": 8,
         "tasks": ["Проходить через капканы", "Не разрывать цепочку", "Закрывать капканы по сигналу"],
         "props": [],
-        "stage_goal": "Пройти как можно дальше, не попавшись"
+        "goal": "Пройти как можно дальше, не попавшись",
+        "orderNum": 1
       }
     ]
   },
   {
     "title": "Палочка-выручалочка",
     "description": "Водящий считает до 10, все прячутся. Затем он ищет. Если найденный успевает добежать до палочки раньше водящего и коснуться её, он «выручен».",
-    "minAge": 7,
-    "maxAge": 11,
-    "minPlayers": 5,
-    "maxPlayers": 15,
+    "age": 9,
+    "players": 10,
     "duration": 10,
     "locationType": "outdoor",
+    "fieldWidth": null,
+    "fieldLength": null,
+    "activityLevel": "high",
+    "photos": null,
     "requisites": ["палочка"],
+    "isPublic": false,
     "stages": [
       {
         "title": "Поиск и спасение",
@@ -909,20 +1080,24 @@
         "duration": 10,
         "tasks": ["Прятаться", "Искать игроков", "Добежать до палочки первым", "Выручать товарищей"],
         "props": ["палочка"],
-        "stage_goal": "Не быть пойманным или выручить всех"
+        "goal": "Не быть пойманным или выручить всех",
+        "orderNum": 1
       }
     ]
   },
   {
     "title": "Водяной",
     "description": "Водящий с закрытыми глазами стоит в круге. Игроки идут по кругу и произносят стишок. На «3» все останавливаются. Водяной на ощупь угадывает, кто перед ним.",
-    "minAge": 7,
-    "maxAge": 11,
-    "minPlayers": 6,
-    "maxPlayers": 15,
+    "age": 9,
+    "players": 11,
     "duration": 8,
     "locationType": "both",
+    "fieldWidth": null,
+    "fieldLength": null,
+    "activityLevel": "low",
+    "photos": null,
     "requisites": ["повязка на глаза"],
+    "isPublic": false,
     "stages": [
       {
         "title": "Водяной",
@@ -930,20 +1105,24 @@
         "duration": 8,
         "tasks": ["Ходить по кругу", "Произносить стишок", "Угадывать игроков на ощупь", "Не подсказывать"],
         "props": ["повязка на глаза"],
-        "stage_goal": "Угадать больше всех игроков"
+        "goal": "Угадать больше всех игроков",
+        "orderNum": 1
       }
     ]
   },
   {
     "title": "Салки",
     "description": "Водящий (салка) догоняет остальных. Кого коснулся, тот становится салкой, но должен бежать, держась рукой за то место, куда его коснулись.",
-    "minAge": 7,
-    "maxAge": 11,
-    "minPlayers": 5,
-    "maxPlayers": 20,
+    "age": 9,
+    "players": 13,
     "duration": 8,
     "locationType": "outdoor",
+    "fieldWidth": null,
+    "fieldLength": null,
+    "activityLevel": "high",
+    "photos": null,
     "requisites": [],
+    "isPublic": false,
     "stages": [
       {
         "title": "Салки",
@@ -951,20 +1130,24 @@
         "duration": 8,
         "tasks": ["Догонять игроков", "Убегать от салки", "Держаться за место касания"],
         "props": [],
-        "stage_goal": "Не стать салкой"
+        "goal": "Не стать салкой",
+        "orderNum": 1
       }
     ]
   },
   {
     "title": "Липучка",
     "description": "Двое водящих, держась за руки, ловят остальных. Каждый пойманный присоединяется к ним, и «липучка» растёт.",
-    "minAge": 7,
-    "maxAge": 11,
-    "minPlayers": 6,
-    "maxPlayers": 20,
+    "age": 9,
+    "players": 13,
     "duration": 8,
     "locationType": "outdoor",
+    "fieldWidth": null,
+    "fieldLength": null,
+    "activityLevel": "high",
+    "photos": null,
     "requisites": [],
+    "isPublic": false,
     "stages": [
       {
         "title": "Липучка",
@@ -972,20 +1155,24 @@
         "duration": 8,
         "tasks": ["Держаться за руки", "Ловить игроков", "Присоединяться к липучке"],
         "props": [],
-        "stage_goal": "Не быть пойманным как можно дольше"
+        "goal": "Не быть пойманным как можно дольше",
+        "orderNum": 1
       }
     ]
   },
   {
     "title": "Рыбачек и рыбки",
     "description": "Рыбачек сидит в центре круга на корточках. Рыбки вокруг произносят стишок. На последнем слове рыбачек вскакивает и ловит рыбок.",
-    "minAge": 7,
-    "maxAge": 11,
-    "minPlayers": 6,
-    "maxPlayers": 15,
+    "age": 9,
+    "players": 11,
     "duration": 8,
     "locationType": "outdoor",
+    "fieldWidth": null,
+    "fieldLength": null,
+    "activityLevel": "high",
+    "photos": null,
     "requisites": [],
+    "isPublic": false,
     "stages": [
       {
         "title": "Рыбачек и рыбки",
@@ -993,20 +1180,24 @@
         "duration": 8,
         "tasks": ["Ходить вокруг рыбачка", "Произносить стишок", "Вскакивать и ловить", "Убегать"],
         "props": [],
-        "stage_goal": "Не быть пойманным"
+        "goal": "Не быть пойманным",
+        "orderNum": 1
       }
     ]
   },
   {
     "title": "Кот и мыши",
     "description": "Мыши бегают, пока кот не смотрит. Как только кот поворачивается — мыши замирают. Кто пошевелился — идёт к коту.",
-    "minAge": 7,
-    "maxAge": 11,
-    "minPlayers": 5,
-    "maxPlayers": 15,
+    "age": 9,
+    "players": 10,
     "duration": 8,
     "locationType": "both",
+    "fieldWidth": null,
+    "fieldLength": null,
+    "activityLevel": "medium",
+    "photos": null,
     "requisites": [],
+    "isPublic": false,
     "stages": [
       {
         "title": "Кот и мыши",
@@ -1014,20 +1205,24 @@
         "duration": 8,
         "tasks": ["Бегать пока кот не смотрит", "Замирать при повороте кота", "Не шевелиться"],
         "props": [],
-        "stage_goal": "Остаться последним незамеченным"
+        "goal": "Остаться последним незамеченным",
+        "orderNum": 1
       }
     ]
   },
   {
     "title": "Медведь и пчёлы",
     "description": "Пчёлы в ульях, медведи в берлоге. Пчёлы улетают — медведи лезут в ульи. По сигналу пчёлы возвращаются и жалят медведей.",
-    "minAge": 7,
-    "maxAge": 11,
-    "minPlayers": 8,
-    "maxPlayers": 20,
+    "age": 9,
+    "players": 14,
     "duration": 10,
     "locationType": "outdoor",
+    "fieldWidth": null,
+    "fieldLength": null,
+    "activityLevel": "high",
+    "photos": null,
     "requisites": ["обручи"],
+    "isPublic": false,
     "stages": [
       {
         "title": "Медведь и пчёлы",
@@ -1035,20 +1230,24 @@
         "duration": 10,
         "tasks": ["Вылетать из ульев", "Залезать в ульи", "Жалить медведей", "Убегать"],
         "props": ["обручи"],
-        "stage_goal": "Не быть пойманным пчёлами"
+        "goal": "Не быть пойманным пчёлами",
+        "orderNum": 1
       }
     ]
   },
   {
     "title": "Бабочки, лягушки, цапли",
     "description": "По трём сигналам дети выполняют разные движения: бабочки — бег с махами руками, лягушки — прыжки на четвереньках, цапли — стояние на одной ноге.",
-    "minAge": 7,
-    "maxAge": 11,
-    "minPlayers": 5,
-    "maxPlayers": 20,
+    "age": 9,
+    "players": 13,
     "duration": 5,
     "locationType": "both",
+    "fieldWidth": null,
+    "fieldLength": null,
+    "activityLevel": "high",
+    "photos": null,
     "requisites": [],
+    "isPublic": false,
     "stages": [
       {
         "title": "Бабочки, лягушки, цапли",
@@ -1056,20 +1255,24 @@
         "duration": 5,
         "tasks": ["Быстро переключаться между движениями", "Правильно выполнять команды", "Не ошибаться"],
         "props": [],
-        "stage_goal": "Ни разу не ошибиться"
+        "goal": "Ни разу не ошибиться",
+        "orderNum": 1
       }
     ]
   },
   {
     "title": "Волк во рву",
     "description": "Чертят ров шириной 50–60 см. В нём 2 волка. Козы прыгают через ров туда и обратно. Волки ловят в момент прыжка.",
-    "minAge": 8,
-    "maxAge": 11,
-    "minPlayers": 10,
-    "maxPlayers": 20,
+    "age": 10,
+    "players": 15,
     "duration": 10,
     "locationType": "outdoor",
+    "fieldWidth": null,
+    "fieldLength": null,
+    "activityLevel": "high",
+    "photos": null,
     "requisites": [],
+    "isPublic": false,
     "stages": [
       {
         "title": "Волк во рву",
@@ -1077,20 +1280,24 @@
         "duration": 10,
         "tasks": ["Прыгать через ров", "Не попадаться волкам", "Ловить коз"],
         "props": [],
-        "stage_goal": "Пройти через ров как можно больше раз"
+        "goal": "Пройти через ров как можно больше раз",
+        "orderNum": 1
       }
     ]
   },
   {
     "title": "Удочка",
     "description": "Ведущий вращает верёвку с мешочком на конце по кругу у пола. Дети прыгают, чтобы мешочек не коснулся ног.",
-    "minAge": 7,
-    "maxAge": 11,
-    "minPlayers": 5,
-    "maxPlayers": 15,
+    "age": 9,
+    "players": 10,
     "duration": 6,
     "locationType": "indoor",
+    "fieldWidth": null,
+    "fieldLength": null,
+    "activityLevel": "high",
+    "photos": null,
     "requisites": ["верёвка с мешочком"],
+    "isPublic": false,
     "stages": [
       {
         "title": "Удочка",
@@ -1098,20 +1305,24 @@
         "duration": 6,
         "tasks": ["Прыгать вверх", "Подбирать ноги", "Не задевать верёвку"],
         "props": ["верёвка с мешочком"],
-        "stage_goal": "Остаться последним незадетым"
+        "goal": "Остаться последним незадетым",
+        "orderNum": 1
       }
     ]
   },
   {
     "title": "Затейники",
     "description": "Водящий в центре круга показывает движение. Все повторяют. Затем новый водящий показывает другое движение.",
-    "minAge": 7,
-    "maxAge": 11,
-    "minPlayers": 5,
-    "maxPlayers": 20,
+    "age": 9,
+    "players": 13,
     "duration": 6,
     "locationType": "both",
+    "fieldWidth": null,
+    "fieldLength": null,
+    "activityLevel": "low",
+    "photos": null,
     "requisites": [],
+    "isPublic": false,
     "stages": [
       {
         "title": "Затейники",
@@ -1119,20 +1330,24 @@
         "duration": 6,
         "tasks": ["Показывать движения", "Повторять движения за водящим", "Быть внимательным"],
         "props": [],
-        "stage_goal": "Точно повторять движения"
+        "goal": "Точно повторять движения",
+        "orderNum": 1
       }
     ]
   },
   {
     "title": "На обломках корабля",
     "description": "Пират ловит игроков. Спастись можно только на «обломках корабля» — безопасных местах. На одном месте нельзя находиться дольше 10 секунд, вдвоём — тоже нельзя.",
-    "minAge": 7,
-    "maxAge": 11,
-    "minPlayers": 4,
-    "maxPlayers": 15,
+    "age": 9,
+    "players": 10,
     "duration": 10,
     "locationType": "outdoor",
+    "fieldWidth": null,
+    "fieldLength": null,
+    "activityLevel": "high",
+    "photos": null,
     "requisites": [],
+    "isPublic": false,
     "stages": [
       {
         "title": "На обломках корабля",
@@ -1140,20 +1355,24 @@
         "duration": 10,
         "tasks": ["Убегать от пирата", "Занимать обломки", "Не стоять на месте дольше 10 секунд", "Не занимать один обломок вдвоём"],
         "props": [],
-        "stage_goal": "Не быть пойманным пиратом"
+        "goal": "Не быть пойманным пиратом",
+        "orderNum": 1
       }
     ]
   },
   {
     "title": "Разведчики и часовой",
     "description": "Часовой охраняет флажки. Разведчики должны украсть флажки. Часовой называет имя разведчика, которого заметил. Замеченный выбывает.",
-    "minAge": 8,
-    "maxAge": 11,
-    "minPlayers": 5,
-    "maxPlayers": 15,
+    "age": 10,
+    "players": 10,
     "duration": 12,
     "locationType": "outdoor",
+    "fieldWidth": null,
+    "fieldLength": null,
+    "activityLevel": "medium",
+    "photos": null,
     "requisites": ["флажки"],
+    "isPublic": false,
     "stages": [
       {
         "title": "Разведчики и часовой",
@@ -1161,20 +1380,24 @@
         "duration": 12,
         "tasks": ["Охранять флажки", "Красть флажки незаметно", "Называть имена замеченных", "Не попадаться"],
         "props": ["флажки"],
-        "stage_goal": "Украсть все флажки или поймать всех разведчиков"
+        "goal": "Украсть все флажки или поймать всех разведчиков",
+        "orderNum": 1
       }
     ]
   },
   {
     "title": "Шаги",
     "description": "Водящий подбрасывает мяч и кричит «Стоп!». Тот, кто поймал мяч, называет количество и вид шагов до водящего. Если после шагов дотрагивается до водящего — становится водящим.",
-    "minAge": 8,
-    "maxAge": 11,
-    "minPlayers": 4,
-    "maxPlayers": 10,
+    "age": 10,
+    "players": 7,
     "duration": 10,
     "locationType": "outdoor",
+    "fieldWidth": null,
+    "fieldLength": null,
+    "activityLevel": "low",
+    "photos": null,
     "requisites": ["мяч"],
+    "isPublic": false,
     "stages": [
       {
         "title": "Шаги",
@@ -1182,20 +1405,24 @@
         "duration": 10,
         "tasks": ["Ловить мяч", "Кричать «Стоп!»", "Назначать шаги", "Точно выполнять шаги"],
         "props": ["мяч"],
-        "stage_goal": "Дотронуться до водящего и стать новым водящим"
+        "goal": "Дотронуться до водящего и стать новым водящим",
+        "orderNum": 1
       }
     ]
   },
   {
     "title": "Пятнашки на верёвочке",
     "description": "Сторож у столбика, держась одной рукой за верёвку, охраняет предметы в круге. Игроки пытаются вытащить предметы. Кого сторож коснулся — выбывает.",
-    "minAge": 7,
-    "maxAge": 11,
-    "minPlayers": 5,
-    "maxPlayers": 15,
+    "age": 9,
+    "players": 10,
     "duration": 8,
     "locationType": "outdoor",
+    "fieldWidth": null,
+    "fieldLength": null,
+    "activityLevel": "medium",
+    "photos": null,
     "requisites": ["верёвка", "камешки"],
+    "isPublic": false,
     "stages": [
       {
         "title": "Пятнашки на верёвочке",
@@ -1203,20 +1430,24 @@
         "duration": 8,
         "tasks": ["Охранять камешки", "Вытаскивать камешки из круга", "Не попадаться сторожу", "Не отпускать верёвку"],
         "props": ["верёвка", "камешки"],
-        "stage_goal": "Сохранить больше камешков или вытащить больше"
+        "goal": "Сохранить больше камешков или вытащить больше",
+        "orderNum": 1
       }
     ]
   },
   {
     "title": "Захват флага",
     "description": "Две команды. У каждой свой флаг на своей половине. Нужно захватить флаг противника и принести на свою территорию, не будучи осаленным.",
-    "minAge": 8,
-    "maxAge": 11,
-    "minPlayers": 10,
-    "maxPlayers": 30,
+    "age": 10,
+    "players": 20,
     "duration": 15,
     "locationType": "outdoor",
+    "fieldWidth": null,
+    "fieldLength": null,
+    "activityLevel": "high",
+    "photos": null,
     "requisites": ["флажки", "повязки"],
+    "isPublic": false,
     "stages": [
       {
         "title": "Захват флага",
@@ -1224,7 +1455,8 @@
         "duration": 15,
         "tasks": ["Охранять свой флаг", "Захватить флаг противника", "Осаливать на своей половине", "Освобождать товарищей"],
         "props": ["флажки", "повязки"],
-        "stage_goal": "Захватить флаг противника и принести на свою половину"
+        "goal": "Захватить флаг противника и принести на свою половину",
+        "orderNum": 1
       }
     ]
   }

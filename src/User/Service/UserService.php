@@ -81,33 +81,6 @@ class UserService
         return $user;
     }
 
-    public function blockUser(int $id, User $admin): void
-    {
-        if (!in_array('ROLE_ADMIN', $admin->getRoles())) {
-            throw new ApiException(ErrorCode::FORBIDDEN);
-        }
-
-        $user = $this->getUser($id);
-
-        if ($user->getId() === $admin->getId()) {
-            throw new ApiException(ErrorCode::FORBIDDEN);
-        }
-
-        $user->setIsBlocked(true);
-        $this->entityManager->flush();
-    }
-
-    public function unblockUser(int $id, User $admin): void
-    {
-        if (!in_array('ROLE_ADMIN', $admin->getRoles())) {
-            throw new ApiException(ErrorCode::FORBIDDEN);
-        }
-
-        $user = $this->getUser($id);
-        $user->setIsBlocked(false);
-        $this->entityManager->flush();
-    }
-
     public function checkEmailUnique(string $email): void
     {
         $existing = $this->userRepository->findOneBy(['email' => $email]);
